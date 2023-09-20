@@ -1,0 +1,1 @@
+export const AUTH_SERVER_PORT = 6969;

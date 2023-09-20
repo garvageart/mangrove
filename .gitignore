@@ -1,0 +1,30 @@
+# File Types
+*.env*
+*.key
+*.keys*
+*.pem
+*.cert
+*.crt
+*.log
+*.ps1
+*.secrets
+.code-workspace
+
+# Folders
+node_modules
+archive
+logs
+public
+build
+images
+.VSCodeCounter
+backups
+references
+metadata
+.svelte-kit
+
+#Specified Files
+package-lock.json
+
+#File Name Patterns
+archive.js*

@@ -1,0 +1,7 @@
+{
+	"ignore": [
+		"src/plugins/left-2-write/client/*.html",
+		"src/plugins/left-2-write/client/*.svelte",
+		"src/plugins/left-2-write/client/*.ts"
+	]
+}
