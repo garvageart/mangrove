@@ -353,7 +353,7 @@ export function validateJSON(input: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const forkChildProcess = (file: string, args: any[], forkOptions: child_process.ForkOptions, logger: Logger = GeneralLogger) => {
     const childProcess = child_process.fork(file, args, forkOptions);
-    childProcess.send({ type: 'parent_start_time', value: PROCESS_START_TIME });
+    // childProcess.send({ type: 'parent_start_time', value: PROCESS_START_TIME });
 
     logChildProcess(childProcess, logger);
 
@@ -362,7 +362,7 @@ export const forkChildProcess = (file: string, args: any[], forkOptions: child_p
 
 export function execChildProcess(command: string, logger: Logger = GeneralLogger) {
     const childProcess = child_process.exec(command);
-    childProcess.send({ type: 'parent_start_time', value: PROCESS_START_TIME });
+    // childProcess.send({ type: 'parent_start_time', value: PROCESS_START_TIME });
 
     logChildProcess(childProcess, logger);
 
@@ -372,7 +372,7 @@ export function execChildProcess(command: string, logger: Logger = GeneralLogger
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function spawnChildProcess(command: string, args: any[], spawnOptions: child_process.SpawnOptionsWithoutStdio, logger: Logger = GeneralLogger) {
     const childProcess = child_process.spawn(command, args, spawnOptions);
-    childProcess.send({ type: 'parent_start_time', value: PROCESS_START_TIME });
+    // childProcess.send({ type: 'parent_start_time', value: PROCESS_START_TIME });
 
     logChildProcess(childProcess, logger);
 
