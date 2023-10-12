@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import { existsSync, rmSync } from 'fs';
-import { CryptographerOptions, DecryptorOptions, EncryptionAlgorithms, EncryptorOptions } from '../types/addons/cryptographer.addon';
+import type { CryptographerOptions, DecryptorOptions, EncryptionAlgorithms, EncryptorOptions } from '../types/addons/cryptographer.addon';
 import Logger from '../logger';
 import { readFileAndRemoveNewLine } from '../util';
 import { NEW_LINE_REGEX } from '../globals';
