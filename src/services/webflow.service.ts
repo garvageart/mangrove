@@ -31,6 +31,16 @@ export class WebflowService<WebflowCollectionFields>  {
         this.siteID = options?.siteID;
     }
 
+    async publishSite(options: { siteId?: string, domains: string[]; }) {
+        if (!options.siteId) {
+            options.siteId = this.siteID;
+        }
+        
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return this.client.publishSite(options);
+    }
+
     async getSite() {
         const site: Site = await this.client.site({ siteId: this.siteID })
             .catch((error) => {
