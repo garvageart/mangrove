@@ -1,24 +1,29 @@
-<script>
-	import { createEventDispatcher, onMount,  } from "svelte";
+<script lang="ts">
+	import { createEventDispatcher } from "svelte";
+
 	const buttonEvent = createEventDispatcher();
 	export const buttonClicked = () => buttonEvent("buttonClicked");
 
-	export let buttonText;
-	export let buttonAction;
-	export let mouseOverText;
-	export let showMouseOverText;
-
-	if (showMouseOverText) {
-		onMount(() => {
-			const button = document.getElementById("lf-button");
-
-			button.onmouseover = () => (button.innerText = mouseOverText);
-			button.onmouseout = () => (button.innerText = buttonText);
-		});
-	}
+	export let buttonText: string;
+	export let initialText: string = buttonText;
+	export let buttonAction: string;
+	export let mouseOverText: string;
+	export let showMouseOverText: boolean;
 </script>
 
-<button on:click={buttonClicked} id="lf-button" data-action={buttonAction}>
+<button
+	on:click={buttonClicked}
+	on:mouseenter={() => {
+		if (showMouseOverText) {
+			buttonText = mouseOverText;
+		}
+	}}
+	on:mouseleave={() => {
+		buttonText = initialText;
+	}}
+	id="lf-button"
+	data-action={buttonAction}
+>
 	{buttonText}</button
 >
 
