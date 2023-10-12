@@ -98,6 +98,18 @@ export default class Logger {
             // Destructure Fastify requests to a simpler object
             if (loggerNameVerifier.includes('fastify')) {
                 const fastifyData = loggingMetadata.message;
+
+                // Don't log base64 image strings
+                let requestBody = fastifyData.res?.request.body;
+                if (requestBody && requestBody.includes('base64') && requestBody.includes('image')) {
+                    requestBody = JSON.parse(requestBody);
+
+                    const base64meta = requestBody.dataURL.split(',')[0];
+                    requestBody.dataURL = base64meta;
+
+                    requestBody = JSON.stringify(requestBody);
+                }
+
                 const fastifyReq: FastifyRequestSimple | undefined = {
                     id: fastifyData.res?.request.id,
                     statusCode: fastifyData.res?.raw?.statusCode,
@@ -107,7 +119,7 @@ export default class Logger {
                     responseTime: fastifyData?.responseTime,
                     params: fastifyData.res?.request.params,
                     query: fastifyData.res?.request.query,
-                    body: fastifyData.res?.request.body,
+                    body: requestBody,
                     url: fastifyData.res?.request.url,
                     ips: fastifyData.res?.request.ips,
                     timeout: fastifyData.res?.request.socket.timeout ?? fastifyData.res?.request.connection.timeout,
