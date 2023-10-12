@@ -3,11 +3,34 @@ body {
 }
 
 #editor .ql-editor {
-    font-size: 0.9em;
-    width: 100%;
-    height: 297mm;
-    padding: 0.75in 1in;
-    /* aspect-ratio: 1/1.41; */
+    font-size: 1em;
+    padding: 0;
+    min-height: 150mm;
+}
+
+/* .ql-snow .ql-editor h2 {
+    margin-bottom: 0.5em;
+}
+
+.ql-snow .ql-editor h3 {
+    margin-bottom: 0.5em;
+}
+
+.ql-snow .ql-editor h4 {
+    margin-bottom: 0.5em;
+}
+
+.ql-snow .ql-editor h5 {
+    margin-bottom: 0.5em;
+}
+
+.ql-snow .ql-editor h6 {
+    margin-bottom: 0.5em;
+} */
+
+.ql-snow .ql-editor blockquote {
+    color: var(--border-colour);
+    font-style: italic;
 }
 
 .ql-snow .ql-stroke {
