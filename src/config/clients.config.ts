@@ -18,7 +18,8 @@ export const spotifyClient = new SpotifyWebApi({
 });
 
 export const fastifyClient = fastify({
-    logger: new FastifyLogger
+    logger: new FastifyLogger,
+    bodyLimit: 30 * 1024 * 1024
 });
 
 export const fastifyImageClient = fastify({
