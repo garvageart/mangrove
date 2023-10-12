@@ -1,29 +1,12 @@
 <script>
 	import { onMount } from "svelte";
 	import "../../../static/css/main.css";
-
-	onMount(() => {
-		const postTitle = document.getElementById("title");
-		const initialTitle = document.title;
-
-		postTitle.onkeyup = () => {
-			if (postTitle.value === "") {
-				document.title = initialTitle;
-				return;
-			}
-
-			document.title = initialTitle + ` | ${postTitle.value}`;
-		};
-	});
 </script>
 
 <div id="header-top">
 	<header id="header">
-		<a id="logo-container" href="/" data-sveltekit-reload>
-			<svg
-				class="logo"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 1330.04 1343.15"
+		<!-- <a id="logo-container" title="Home" href="/" data-sveltekit-reload>
+			<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330.04 1343.15"
 				><defs
 					><style>
 						.d {
@@ -46,18 +29,15 @@
 							y1="253.11"
 							x2="973.33"
 							y2="1005.37"
-						/><line
-							class="d logo-lines"
-							x1="973.33"
-							y1="1005.37"
-							x2="212.76"
-							y2="1324.71"
-						/></g
+						/><line class="d logo-lines" x1="973.33" y1="1005.37" x2="212.76" y2="1324.71" /></g
 					></g
 				></svg
 			>
-		</a>
-		<input id="title" placeholder="Untitled post" />
+		</a> -->
+		<a href="/" id="lf-home-text" title="Home" class="header-text-container" data-sveltekit-reload>Home</a>
+		<div id="lf-story-history-container" class="header-text-container">
+			<div>Story History</div>
+		</div>
 	</header>
 	<div id="toolbar">
 		<!-- Add font size dropdown -->
@@ -137,11 +117,14 @@
 		display: flex;
 		justify-content: center;
 		background-color: #f8f8f8;
+		font-family: "Switzer";
+		font-weight: 500;
 	}
 
 	#header {
 		border-bottom: 1px solid var(--border-colour);
 		width: 100%;
+		height: 1.5em;
 		align-items: center;
 		justify-content: left;
 		display: flex;
@@ -155,9 +138,9 @@
 		/* box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2); */
 	}
 
-	.logo {
-		height: 2em;
-		margin: 0.5em;
+	/* .logo {
+		height: 1.0em;
+		margin: 0.3em;
 		fill: #f8f8f8;
 	}
 
@@ -167,23 +150,21 @@
 
 	#logo-container {
 		background-color: #111111;
-	}
-
-	#title {
-		border: 0px;
-		/* border-bottom: 1px solid var(--border-colour); */
 		height: 100%;
-		font-size: 1em;
-		font-weight: 700;
-		font-family: "Switzer";
-		margin-left: 2em;
-		margin-right: 2em;
 		display: flex;
-		justify-content: left;
 		align-items: center;
-		text-align: left;
-		width: 50%;
-		max-width: 100%;
-		background-color: #f8f8f8;
+		justify-content: center;
+	} */
+
+	.header-text-container {
+		/* width: 10em; */
+		height: 100%;
+		font-weight: 600;
+		font-size: 0.6em;
+		border-right: 1px solid var(--border-colour);
+		padding: 1em;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 </style>

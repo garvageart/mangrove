@@ -6,10 +6,10 @@ import type { PageServerLoad } from "./$types";
 export const ssr = false;
 
 export const load: PageServerLoad = async (loadEvent) => {
-    const postID = loadEvent.params.slug;
+    const postID = loadEvent.params.id;
     // $socket
 
-    const postData = (await loadEvent.fetch(`${L2W_SERVER_HREF}/posts/${postID}`)).json() as unknown as ILeft2Write
+    const postData = (await loadEvent.fetch(`${L2W_SERVER_HREF}/posts/${postID}`)).json() as unknown as ILeft2Write;
 
-    return { postID, postData};
+    return { postID, postData };
 };
