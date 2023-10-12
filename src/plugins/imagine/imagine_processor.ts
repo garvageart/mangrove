@@ -43,6 +43,14 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
         mkdirpSync(this.exportDirectory);
 
         this.exportFiles = fs.readdirSync(this.exportDirectory);
+
+        this.initializeMongoDBConnection({
+            dbName: IS_ENV.production ? MONGODB_DEFAULT_DATABASE : "WebflowCollectionsTestDB",
+            uri: process.env.MONGODB_DOMAIN,
+            retryLimit: 3,
+            retryTimeout: secondsToMs(5),
+            localFallback: MONGODB_FALLBACK_LOCALLY
+        });
     }
 
     createCategoryDirectories(categories: string[]) {
@@ -60,15 +68,6 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
     }
 
     async processor(directories: string[], retryLimit = 3) {
-        await this.initializeMongoDBConnection({
-            dbName: IS_ENV.production ? MONGODB_DEFAULT_DATABASE : "WebflowCollectionsTestDB",
-            uri: process.env.MONGODB_DOMAIN,
-            retryLimit: 3,
-            retryTimeout: secondsToMs(5),
-            localFallback: MONGODB_FALLBACK_LOCALLY
-        });
-
-
         const processedDataArray: ProcessedImagesData[] = [];
         const failedImages: ProcessedImagesMetadata[] = [];
 
@@ -310,13 +309,6 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
 
         // NOTE - 26/05/2023: This code runs so EXTREMELY slowly.
         // Make upload to Webflow run asynchronously and handle any other work in the meantime
-        await this.initializeMongoDBConnection({
-            dbName: IS_ENV.production ? MONGODB_DEFAULT_DATABASE : "WebflowCollectionsTestDB",
-            uri: process.env.MONGODB_DOMAIN,
-            retryLimit: 3,
-            retryTimeout: secondsToMs(5),
-            localFallback: MONGODB_FALLBACK_LOCALLY
-        });
 
         const webflowCollections = await this.webflowService.getAllCollections();
         const photographyCollection = webflowCollections.find(collection => collection.name.toLowerCase().includes('photography'));
@@ -336,7 +328,7 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
                 photoCategory = imageDocument.image_category;
 
                 const currentCollection = photoCategory.toLowerCase().includes('visual') ? visualArtsCollection : photographyCollection;
-                
+
                 webflowCollectionImageFileNames = (await this.webflowService.getCollectionItems(currentCollection._id)).map(item => item['photo-file-name']);
                 webflowCollectionImageIDs = (await this.webflowService.getCollectionItems(currentCollection._id)).map(item => item['name']);
             }
@@ -359,7 +351,7 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
             const photoEXIFTags = ExifReader.load(photoBuffer, { expanded: true }).exif;
             const photoEXIFDate = photoEXIFTags?.DateTimeOriginal?.description ?? photoEXIFTags?.DateTime?.description;
             const photoDate = convertEXIFDateTime(photoEXIFDate) ?? photoStats.birthtime;
-            
+
             if (webflowCollectionImageFileNames.includes(imageDocument.export_image_name) ||
                 webflowCollectionImageIDs.includes(imageDocument.image_id)) {
                 this.logger.info(`${imageDocument.export_image_name} already exists on Webflow Collection ${this.pluginColour(currentCollection.name)}`);
