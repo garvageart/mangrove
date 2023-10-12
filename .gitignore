@@ -22,6 +22,7 @@ backups
 references
 metadata
 .svelte-kit
+credentials
 
 #Specified Files
 package-lock.json
