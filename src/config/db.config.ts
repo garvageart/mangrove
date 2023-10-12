@@ -5,7 +5,7 @@ import type { IFlowStateCollections, IFlowStateSites } from '../types/webflow.se
 import { secondsToMs } from '../util';
 import type { ConnectToDbOptions } from '../types/db.service';
 import { IS_ENV, MONGODB_DEFAULT_DATABASE, MONGODB_FALLBACK_LOCALLY } from '../globals';
-import type { ILeft2Write } from '../types/plugins/l2w.types';
+import type { ILeft2Write, ILeft2WriteImages } from '../types/plugins/l2w.types';
 
 export const MUSE_DB_CONNECTION_DEFAULTS: ConnectToDbOptions = {
     dbName: IS_ENV.production ? MONGODB_DEFAULT_DATABASE : "HelloImSiera",
@@ -275,6 +275,10 @@ export const left2Write = new MDBSchema<ILeft2Write>({
         type: String,
         required: true
     },
+    l2w_description: {
+        type: String,
+        required: false
+    },
     l2w_last_saved_at: {
         type: Date,
         required: true
@@ -314,5 +318,32 @@ export const left2Write = new MDBSchema<ILeft2Write>({
     l2w_thumbnail: {
         type: String,
         required: false
+    }
+}, { timestamps: true });
+
+export const left2WriteImages = new MDBSchema<ILeft2WriteImages>({
+    l2w_image_conversion_date: {
+        type: Date,
+        required: true
+    },
+    l2w_image_conversion_file_name: {
+        type: String,
+        required: true
+    },
+    l2w_image_id: {
+        type: String,
+        required: true
+    },
+    l2w_image_original_file_name: {
+        type: String,
+        required: false
+    },
+    l2w_image_post_id: {
+        type: String,
+        required: true
+    },
+    l2w_image_url: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
