@@ -1,7 +1,7 @@
 import type { FlowStateSchema } from "../webflow.service";
 import type Delta from 'quill-delta';
 
-export type PostStatus = "draft" | "published" | "staged";
+export type PostStatus = "draft" | "published" | "staged" | "unpublished";
 export type PostAction = "unpublish" | "publish" | "stage" | "update";
 
 export interface ILeft2Write {
@@ -9,8 +9,8 @@ export interface ILeft2Write {
     updatedAt: Date;
     l2w_id: string;
     l2w_title: string;
-    l2w_id?: string;
     l2w_thumbnail?: string;
+    l2w_description?: string;
     l2w_author: string;
     l2w_slug?: string;
     l2w_plain_text: string;
@@ -22,12 +22,22 @@ export interface ILeft2Write {
     l2w_wf_item_id?: string;
 }
 
+export interface ILeft2WriteImages {
+    l2w_image_id: string;
+    l2w_image_url: string;
+    l2w_image_post_id: string;
+    l2w_image_original_file_name?: string;
+    l2w_image_conversion_file_name: string;
+    l2w_image_conversion_date: Date;
+}
+
 export interface FlowStateL2W extends FlowStateSchema {
     "post-author": string;
     "post-id": string;
     "post-last-saved-at": Date;
     "post-rich-text": string;
     "post-plain-text": string;
+    "post-description"?: string;
     "post-thumbnail"?: string;
     "post-image-urls"?: string[];
 }
