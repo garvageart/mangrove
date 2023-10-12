@@ -1,0 +1,22 @@
+{
+	"name": "Leaf Editor - lesis.online Blog Editor",
+	"short_name": "Leaf Editor",
+	"icons": [
+		{
+			"src": "/icons/android-chrome-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "/icons/android-chrome-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	],
+	"theme_color": "#181818",
+	"background_color": "#f8f8f8",
+	"display": "standalone",
+	"start_url": "http://leaf-editor.lesis.online:5555/",
+	"direction": "rtl",
+	"language": "en-GB"
+}
