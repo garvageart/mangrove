@@ -2,7 +2,7 @@
 	import Header from "$lib/ui/header.svelte";
 	import type { ILeft2Write } from "../../../../types/plugins/l2w.types";
 	import { L2W_EDITOR_HREF, L2W_SERVER_HREF } from "../../l2w.constants";
-	import { convertToSentenceCase } from "../../l2w.util";
+	import { convertDate, convertToSentenceCase } from "../../l2w.util";
 	import type { PageData } from "./$types";
 	// import "../static/css/home.css";
 
@@ -13,20 +13,6 @@
 	// 		.getElementsByTagName("head")[0]
 	// 		.append((document.createElement("script").src = "js/main.js"));
 	// }
-
-	const convertDate = (inputDate: Date) => {
-		const date = inputDate;
-		const day = date.getDate();
-		const month = date.toLocaleString("default", { month: "short" });
-		const year = date.getFullYear();
-
-		return `${day} ${month.substring(0, 3)} ${year} — ${date.toLocaleTimeString(
-			"en-ZA",
-			{
-				timeStyle: "short"
-			}
-		)}`;
-	};
 
 	async function createNewPost() {
 		const currentDate = new Date();
@@ -66,11 +52,7 @@
 		>
 			<div id="plus-icon-container">
 				<svg xmlns="http://www.w3.org/2000/svg" width="36.5" height="36.5">
-					<g
-						id="plus-icon"
-						data-name="plus-icon"
-						transform="translate(-104.75 -230.75)"
-					>
+					<g id="plus-icon" data-name="plus-icon" transform="translate(-104.75 -230.75)">
 						<line
 							id="vertical-line"
 							data-name="vertical-line"
@@ -100,12 +82,7 @@
 
 	<div id="posts-container">
 		{#each data.posts as post}
-			<a
-				id="post-container"
-				href="editor/{post.l2w_id}"
-				class="single-post-container"
-				data-post-id={post.l2w_id}
-			>
+			<a id="post-container" href="editor/{post.l2w_id}" class="single-post-container" data-post-id={post.l2w_id}>
 				<div id="title-container">
 					<h1 id="post-title">
 						{post.l2w_title}
@@ -120,10 +97,11 @@
 					</div>
 				</div>
 				<div id="post-content">
-					{#if !post.l2w_plain_text}
+					{#if !post.l2w_plain_text.trim()}
 						<em>Nothing to show here :(</em>
 					{:else}
-						{@html post.l2w_raw_html.replaceAll('"', "")}
+						{post.l2w_plain_text}
+						<!-- {@html post.l2w_raw_html.replaceAll(/<a.*?>.*?<\/a>/ig,'')} -->
 					{/if}
 				</div>
 			</a>
@@ -133,8 +111,8 @@
 
 <style>
 	#main-container {
-		margin: 1em;
-		padding: 1em 2em 1em 2em;
+		/* margin: 1em; */
+		padding: 2em 5em;
 		display: flex;
 		flex-direction: column;
 		flex-wrap: wrap;
@@ -143,7 +121,8 @@
 
 	.single-post-container {
 		height: 10em;
-		width: 12em;
+		min-width: 12em;
+		max-width: 13em;
 		border: 1px solid;
 		margin: 0 0 0 0;
 		overflow: hidden;
