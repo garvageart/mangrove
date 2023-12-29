@@ -35,7 +35,7 @@ export default class MusePlugin extends PluginInstance<FlowStateMuse, IMuseSpoti
                     authTagLength: 16,
                     outputEncoding: 'hex',
                     keyStorage: {
-                        path: IS_ENV.production ? "./.muse.keys" : "./.test.muse.keys"
+                        path: IS_ENV.production ? "./credentials/.muse.keys" : "./credentials/.test.muse.keys"
                     }
                 })
             ]
@@ -300,7 +300,7 @@ export default class MusePlugin extends PluginInstance<FlowStateMuse, IMuseSpoti
             this.logger.info(`Fetching playlist data from Spotify for '${playlistURL}'...`);
             const playlistData = await this.client.getPlaylist(parsedSpotifyURL.spotifyID)
                 .then(response => response.body);
-                
+
             if (!playlistData.description) {
                 playlistData.description = "";
             }
