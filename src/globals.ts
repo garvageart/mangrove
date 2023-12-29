@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { DateTime } from "luxon";
 import fs from "fs";
 import type packageJSON from '../package.json';
 
@@ -22,9 +23,9 @@ export const IS_ENV = {
 
 export const FORMATTED_DATES = {
     SINGLE_VALUES: {
-        DAY: dayjs().date(),
+        DAY: DateTime.now().day,
         CONVERT_MONTH: () => {
-            const month = dayjs().month() + 1;
+            const month = DateTime.now().month + 1;
             if (month < 10) {
                 return `0${month}`;
             }
@@ -33,7 +34,7 @@ export const FORMATTED_DATES = {
         get MONTH() {
             return this.CONVERT_MONTH();
         },
-        YEAR: dayjs().year()
+        YEAR: DateTime.now().year
     },
     CURRENT_DATE: dayjs().format('DD_MM_YYYY'),
     CURRENT_DATETIME_FILE: () => dayjs().format('DDMMYYYYHHmmss'),
