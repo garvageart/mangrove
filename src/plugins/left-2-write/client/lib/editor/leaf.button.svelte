@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
 
-	const buttonEvent = createEventDispatcher();
-	export const buttonClicked = () => buttonEvent("buttonClicked");
+	const dispatch = createEventDispatcher();
+	export const buttonClicked = () => dispatch("buttonClicked");
 
 	export let buttonText: string;
-	export let initialText: string = buttonText;
+	const initialText: string = buttonText;
 	export let buttonAction: string;
-	export let mouseOverText: string;
-	export let showMouseOverText: boolean;
+	export let mouseOverText: string = "";
+	export let showMouseOverText: boolean = mouseOverText ? true : false;
 </script>
 
 <button
@@ -21,21 +21,23 @@
 	on:mouseleave={() => {
 		buttonText = initialText;
 	}}
-	id="lf-button"
-	data-action={buttonAction}
+	id={`lf-button-${buttonAction.toLowerCase().replaceAll(" ", "-")}`}
+	class=lf-button
+	data-action={buttonAction.toLowerCase().replaceAll(" ", "-")}
 >
-	{buttonText}</button
->
+	{buttonText}
+</button>
 
 <style>
-	#lf-button {
+	.lf-button {
 		border-radius: 0px;
 		font-family: "Switzer";
 		font-weight: 500;
 		font-size: 0.5em;
 		color: var(--almost-white);
 		background-color: var(--almost-black);
-		min-width: 6em;
+		/* min-width: 10em; */
+		width: 12em;
 		height: 2.5em;
 		margin-top: 1em;
 		padding-top: 1em;
@@ -49,7 +51,7 @@
 		cursor: pointer;
 	}
 
-	#lf-button:hover {
-		background-color: #292929;
+	.lf-button:hover {
+		background-color: #3f3f3f;
 	}
 </style>
