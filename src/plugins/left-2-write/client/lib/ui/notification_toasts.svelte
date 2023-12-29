@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { fade } from "svelte/transition";
 	import { dismissToast, toasts } from "./notification_toast.store";
-	import CloseIcon from "./close_icon.svelte";
-
-	export let dismissible = true;
+	import CloseIcon from "./CloseIcon.svelte";
+	import { convertTextURLsToHref } from "left-2-write/routes/new-editor/[id]/leaf.utils";
 </script>
 
 {#if $toasts}
@@ -11,10 +10,10 @@
 		{#each $toasts as toast}
 			<article id="lf-toast" role="alert" transition:fade>
 				<div id="lf-toast-message">
-					{toast.message}
+					{@html convertTextURLsToHref(toast.message)}
 				</div>
 
-				{#if dismissible}
+				{#if toast.dismissible}
 					<button id="lf-toast-close" on:click={() => dismissToast(toast.id)}>
 						<CloseIcon />
 					</button>
