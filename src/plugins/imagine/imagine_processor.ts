@@ -179,7 +179,7 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
                 // Export file data
                 const exportImageID = makePID(16);
                 const exportMetadataString = `${versionNumber}_${exportImageID}${processingQuality}${FORMATTED_DATES.CURRENT_DATETIME_FILE()}`;
-                const exportDomainName = process.env.WEBSITE_DOMAIN_NAME.replaceAll(".", "");
+                const exportDomainName = process.env.PUBLIC_WEBSITE_DOMAIN_NAME.replaceAll(".", "");
                 const exportFileName = `${exportDomainName}-${imageCategory}-${exportMetadataString}`;
 
                 const exportMetadata: ProcessedImagesMetadata = {
@@ -187,6 +187,7 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
                     sourcePath,
                     sourceSize,
                     sourceDateCreated,
+                    sourceEXIFTags,
                     category: directory,
                     exportImageID,
                     exportMetadataString,
@@ -285,7 +286,8 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
                         export_image_size_string: exportSizeString,
                         source_image_name: data.metadata.sourceName,
                         source_image_size: data.metadata.sourceSize,
-                        source_image_size_string: sourceSizeString
+                        source_image_size_string: sourceSizeString,
+                        export_image_exif_tags: data.metadata.sourceEXIFTags
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
                     }).then(document => this.logger.info(`${this.pluginColour(document.export_image_name)} has been saved to the database`))
