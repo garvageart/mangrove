@@ -7,6 +7,8 @@ import { ImaginePlugin } from "./plugins/imagine/imagine_processor";
 import { WebflowService } from "./services/webflow.service";
 import { forkChildProcess, getClassMethods } from "./util";
 import MusePlugin from "./plugins/muse/muse_client";
+import { L2W_EDITOR_HREF } from "./plugins/left-2-write/l2w.constants";
+import type child_process from "child_process";
 
 const logger = GeneralLogger;
 
@@ -23,26 +25,12 @@ await database.initializeDatabase({
     localFallback: MONGODB_FALLBACK_LOCALLY
 });
 
-// const processInactivityTimeSec = IS_ENV.production ? 300 : 60;
-
-// function createInactivityTimeout(time: number) {
-//     return setTimeout(() => {
-//         process.on('beforeExit', async () => {
-//             await database.disconnect();
-//         });
-
-//         logger.warn(`Process was inactive for ${time} seconds. Exiting main process...`);
-//         process.exit(0);
-//     }, secondsToMs(time));
-// }
-
-// let inactivityTimeout = createInactivityTimeout(processInactivityTimeSec);
-const methodFilterRegEx = /"colour" | "mongo" | "connection"/;
-
-process.stdin.on('keypress', async () => {
-    // clearTimeout(inactivityTimeout);
-    // inactivityTimeout = createInactivityTimeout(processInactivityTimeSec);
+database.connection.on('disconnected', () => {
+    logger.warn('Mangrove has disconnected from MongoDB, continuously polling for reconnection in the background');
 });
+
+// This currently doesn't work as it should, needs to be fixed
+const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
 
 (async function main(): Promise<void> {
     async function registerCLIOptions(cliOption: object) {
@@ -65,26 +53,26 @@ process.stdin.on('keypress', async () => {
             // @ts-ignore
             await cliOption[cliPrompt.action]();
         } catch (error) {
-            logger.error(`An error occurred while running ${cliPrompt.action}:`, logger.logError(error));
+            logger.warn(`An error occurred while running ${cliPrompt.action}:`, logger.logError(error));
         }
 
         process.on('uncaughtException', (error) => {
-            logger.error(`An uncaught exception occurred while running ${cliPrompt.action}:`, error);
+            logger.warn(`An uncaught exception occurred while running ${cliPrompt.action}:`, error);
         });
 
-        // inactivityTimeout = createInactivityTimeout(processInactivityTimeSec);
 
         return await main();
     }
 
+    const childProcesses: child_process.ChildProcess[] = [];
+
     process.stdin.on('keypress', async (ch, key) => {
         if (key && key.ctrl && key.name == 'b') {
             process.stdin.removeAllListeners('keypress');
+            process.removeAllListeners();
 
+            childProcesses.forEach(process => process?.kill(1));
             console.clear();
-
-            // clearTimeout(inactivityTimeout);
-            // inactivityTimeout = createInactivityTimeout(processInactivityTimeSec);
 
             return await main();
         }
@@ -103,64 +91,77 @@ process.stdin.on('keypress', async () => {
         name: 'option',
         message: 'What would you like to use?',
         type: 'list',
-        choices: ['Imagine', 'Muse', 'Webflow Service', 'Backup Database', 'Launch File Server', 'Launch Spotify Authorization Server', 'Exit']
+        choices: ['Imagine', 'Muse', 'Left-2-Write', 'Webflow Service', 'Launch File Server', 'Launch Spotify Authorization Server', 'Exit']
     });
 
     switch (startPrompt.option) {
         case 'Webflow Service': {
             const webflow = WebflowService;
 
-            await registerCLIOptions(new webflow({
+            registerCLIOptions(new webflow({
                 siteID: process.env.WEBFLOW_SITE_ID
             }));
 
             break;
         }
+
         case 'Imagine': {
             const imagine = ImaginePlugin;
             const processingQuality = IS_ENV.production ? 80 : 30;
 
-            await registerCLIOptions(new imagine({ processingQuality }));
+            registerCLIOptions(new imagine({ processingQuality }));
 
             break;
         }
+
         case 'Muse': {
             const muse = MusePlugin;
 
-            await registerCLIOptions(new muse());
+            registerCLIOptions(new muse());
 
             break;
         }
-        case 'Backup Database': {
-            new DatabaseService().backUpDatabaseLocally({
-                archiveDirectory: process.env.MONGODB_BACKUP_FILE,
-                database: 'HelloImSiera',
-                host: process.env.MONGODB_DOMAIN,
-                localDatabase: 'HelloImSiera',
-                password: process.env.MONGODB_PASS,
-                username: process.env.MONGODB_USER
-            });
 
-            await main();
+        case 'Left-2-Write': {
+            const left2WriteBackend = forkChildProcess('src/plugins/left-2-write/server/l2w_client.ts', ['child'], {
+                execArgv: ['--loader', 'tsx'],
+                cwd: process.cwd(),
+            }, logger);
+
+            const svelteKitProcess = forkChildProcess('build/l2w_svelte_server.js', ['child'], {
+                cwd: process.cwd(),
+            }, logger);
+
+            childProcesses.push(left2WriteBackend);
+            childProcesses.push(svelteKitProcess);
+
+            logger.info(`Open Leaf editor at ${L2W_EDITOR_HREF}`);
 
             break;
         }
+
         case 'Launch File Server': {
-            forkChildProcess('src/plugins/imagine/imagine_server.ts', ['child'], {
+            const fileServerProcess = forkChildProcess('src/plugins/imagine/imagine_server.ts', ['child'], {
                 execArgv: ['--loader', 'tsx'],
                 cwd: process.cwd(),
             }, logger);
 
+            childProcesses.push(fileServerProcess);
+            
             break;
         }
+
         case 'Launch Spotify Authorization Server': {
-            forkChildProcess('src/plugins/muse/muse_auth_server.ts', ['child'], {
+            const spotifyServerProcess = forkChildProcess('src/plugins/muse/muse_auth_server.ts', ['child'], {
                 execArgv: ['--loader', 'tsx'],
                 cwd: process.cwd(),
             }, logger);
 
+            childProcesses.push(spotifyServerProcess);
+
             break;
         }
+
         case 'Exit': {
             await database.disconnect();
 
