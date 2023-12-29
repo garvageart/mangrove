@@ -9,7 +9,7 @@ const buildResult = await esbuild.build({
     minify: false,
     minifySyntax: false,
     platform: 'node',
-    target: 'node19',
+    target: 'node20',
     format: 'esm',
     outdir: 'build',
     packages: 'external',
