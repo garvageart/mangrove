@@ -35,7 +35,7 @@ export class WebflowService<WebflowCollectionFields>  {
         if (!options.siteId) {
             options.siteId = this.siteID;
         }
-        
+
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this.client.publishSite(options);
@@ -289,7 +289,7 @@ export class WebflowService<WebflowCollectionFields>  {
                 this.logger.info(`Webflow Collection ${this.colour(collectionID)} does not exist on Webflow anymore. Deleting from the local database...`);
 
                 await webflowMongo.deleteDocument({ wf_collection_id: collectionID })
-                    .then(document => this.logger.info(`Webflow Collection ${this.colour(document.wf_collection_name)} has been deleted from the local database`))
+                    .then(() => this.logger.info(`Webflow Collection ${this.colour(collectionID)} has been deleted from the local database`))
                     .catch(error => this.logger.error(`An error occured deleting the Webflow Collection ${this.colour(collectionID)} on the local database:`, error));
             }
         }
