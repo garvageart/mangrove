@@ -9,9 +9,9 @@
 	export let showSeperator: boolean = false;
 
 	onMount(() => {
-		setTimeout(()=> {
+		// setTimeout(()=> {
 			$loading = false;
-		}, 2000)
+		// }, 2000)
 	});
 </script>
 
