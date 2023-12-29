@@ -3,7 +3,7 @@ import inquirer from 'inquirer';
 import mongoose from 'mongoose';
 import Logger from '../logger';
 import type { BackupDatabaseOptions, ConnectToDbOptions, DBServiceOptions } from '../types/db.service';
-import { spawnChildProcess, msToSeconds, secondsToMs, sleep } from '../util';
+import { msToSeconds, secondsToMs, sleep, execChildProcess } from '../util';
 import { MONGODB_DEFAULT_PORT, IS_ENV } from '../globals';
 
 export class DatabaseService<DataInterface> {
@@ -37,7 +37,7 @@ export class DatabaseService<DataInterface> {
                 retryWrites: true,
                 maxPoolSize: 5
             }).asPromise().then((connection) => {
-                this.logger.info(`New MongoDB connection established on '${options.uri}' at '${options.dbName}' for '${this.collectionName}`);
+                this.logger.info(`New MongoDB connection established on '${kOptions.uri}' at '${kOptions.dbName}' for '${this.collectionName}'`);
 
                 return connection;
             });
@@ -55,12 +55,26 @@ export class DatabaseService<DataInterface> {
             return connection;
         }
 
+        if (process.argv.includes('localDb')) {
+            this.logger.info(`Connecting to '${options.dbName}' on localhost. Please wait...`);
+            connection = await kCreateConnection({
+                uri: process.env.MONGODB_URI_LOCAL,
+                dbName: options.dbName
+            });
+
+            this.model = connection.model<DataInterface>(this.collectionName, this.schema);
+            this.connection = connection;
+
+            return connection;
+        }
+
         try {
             this.logger.info(`Connecting to '${options.dbName}' at '${options.uri}:${MONGODB_DEFAULT_PORT}'. Please wait...`);
             connection = await kCreateConnection(options);
 
             this.model = connection.model<DataInterface>(this.collectionName, this.schema);
             this.connection = connection;
+            isConnected = connection.readyState === 1;
 
         } catch (error) {
             isConnected = false;
@@ -75,7 +89,7 @@ export class DatabaseService<DataInterface> {
                 await sleep(timeToRetry);
 
                 try {
-                    this.logger.info(`Retrying connection to '${options.dbName}' at {options.uri}:${MONGODB_DEFAULT_PORT}'. Please wait...`);
+                    this.logger.info(`Retrying connection to '${options.dbName}' at ${options.uri}:${MONGODB_DEFAULT_PORT}'. Please wait...`);
                     connection = await kCreateConnection(options);
                     isConnected = connection.readyState === 1;
                 } catch (error) {
@@ -86,8 +100,6 @@ export class DatabaseService<DataInterface> {
                     break;
                 }
             }
-
-
 
             if (isConnected) {
                 return connection;
@@ -101,7 +113,7 @@ export class DatabaseService<DataInterface> {
             }
 
             if (!isConnected && options.localFallback === true) {
-                this.logger.info('Falling back to local MongoDB connection...');
+                this.logger.warn('Falling back to local MongoDB connection...');
 
                 connection = await kCreateConnection({
                     uri: process.env.MONGODB_URI_LOCAL,
@@ -262,19 +274,14 @@ export class DatabaseService<DataInterface> {
             .catch(err => this.logger.error('There was an error disconnecting', err));
     }
 
+    /**
+     * 
+     * @deprecated
+     */
     async backUpDatabaseLocally(options: BackupDatabaseOptions) {
-        const mongodump = spawnChildProcess(
-            "mongodump",
-            [
-                `--host=${options.host}`,
-                `--port=${MONGODB_DEFAULT_PORT}`,
-                `--db=${options.database}`,
-                `--username=${options.username}`,
-                `--password=${options.password}`,
-                '--authenticationDatabase=admin',
-                `--out=${options.archiveDirectory}`,
-                '--archive'
-            ], {}, this.logger
+        const mongodump = execChildProcess(
+            `mongodump mongodb://${options.host}:${MONGODB_DEFAULT_PORT} --db ${options.database} --username ${options.username} --password ${options.password} --authenticationDatabase admin  --out ${options.archiveDirectory} '--archive`,
+            this.logger
         );
 
         mongodump.on('error', (error) => {
@@ -283,20 +290,17 @@ export class DatabaseService<DataInterface> {
         });
 
         mongodump.on('exit', (code) => {
+            if (code !== 0) {
+                this.logger.error(`MongoDB Backup failed. ${options.database} could not be backed up`);
+                return;
+            }
+
             this.logger.info(`MongoDB backup completed. Process exited with code ${code}`);
             this.logger.info('Launching mongorestore and importing backup data onto local machine');
 
-            spawnChildProcess(
-                "mongorestore",
-                [
-                    `--port=${MONGODB_DEFAULT_PORT}`,
-                    `--db=${options.localDatabase}`,
-                    `--username=${options.username}`,
-                    `--password=${options.password}`,
-                    '--authenticationDatabase=admin',
-                    '--archive',
-                    `--dir=${options.archiveDirectory}`
-                ], {}, this.logger
+            execChildProcess(
+                `mongorestore --port ${MONGODB_DEFAULT_PORT} --db ${options.localDatabase} --username ${options.username} --password ${options.password} --authenticationDatabase admin --archive --dir ${options.archiveDirectory}`,
+                this.logger
             );
         });
     }
