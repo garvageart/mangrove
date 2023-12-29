@@ -24,10 +24,10 @@ export interface FastifyRequestSimple {
     responseTime: number;
     params: object;
     query: object;
+    headers: object;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     body: any | undefined;
     url: string;
-    ips: string[] | undefined;
     timeout: number;
     peername: {
         address: string,
@@ -77,6 +77,7 @@ export interface LoggingMetadata {
     pid: number;
     environment: string | undefined;
     version: string;
+    nodeVersion: string;
     platform: string;
     level: number;
     levelName: string;
