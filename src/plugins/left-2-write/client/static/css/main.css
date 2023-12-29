@@ -8,14 +8,14 @@
     --grey: #707070;
     --almost-black: #181818;
     --almost-white: #f8f8f8;
+    --link-colour: #0066cc;
 }
 
-body {
+html {
     font-size: 30px;
     size: 30px;
     color: #181818;
-    background-color: #dddddd;
-    font-family: 'Switzer';
+    font-family: 'Switzer', sans-serif;
     height: 100%;
     width: 100%;
 }
@@ -32,6 +32,18 @@ body::-webkit-scrollbar {
     width: 16px;
 }
 
+main::-webkit-scrollbar-thumb {
+    height: 56px;
+    border-radius: 8px;
+    border: 4px solid transparent;
+    background-clip: content-box;
+    background-color: #919191;
+}
+
+main::-webkit-scrollbar {
+    width: 16px;
+}
+
 a {
     color: var(--almost-black);
     text-decoration: none
@@ -41,9 +53,19 @@ button {
     border-width: 0px;
     border-style: none;
     border-image: none;
+    font-family: 'Switzer', sans-serif;
 }
 
 ::selection {
     color: white;
     background-color: var(--almost-black)
+}
+
+.bottom-border {
+    border-bottom: 1px solid var(--border-colour);
+}
+
+.unselectable {
+    user-select: none;
+    -webkit-user-select: none;
 }
