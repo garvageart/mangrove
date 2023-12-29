@@ -6,7 +6,7 @@
 		x="1"
 		y="43"
 		width="60"
-		height="9"
+		height="7.5"
 		transform="rotate(-45 1 43)"
 		fill=var(--almost-white)
 	/>
@@ -14,7 +14,7 @@
 		x="7"
 		y="1"
 		width="60"
-		height="9"
+		height="7.5"
 		transform="rotate(45 7 1)"
 		fill=var(--almost-white)
 	/>
