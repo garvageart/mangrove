@@ -4,7 +4,8 @@ import util from 'util';
 import child_process from 'child_process';
 import type { isNumberBetweenCompareValueReturnTypes, isNumberBetweenCompareValueSettings } from "./types/util.types";
 import Logger, { GeneralLogger } from './logger';
-import { NEW_LINE_REGEX, PROCESS_START_TIME } from './globals';
+import { NEW_LINE_REGEX } from './globals';
+import crypto from 'crypto';
 
 /**
  * Generates a randomized ID with a specified length.
@@ -90,6 +91,38 @@ export function generateUniqueTimeBasedID(): string {
     } while (newString.length > 16);
 
     return newString;
+}
+
+/** 
+ * Code from: https://stackoverflow.com/a/25690754/19047678
+ */
+function randomString(length: number, chars: string | unknown[]) {
+    if (!chars) {
+        throw new Error("Argument 'chars' is undefined");
+    }
+
+    const charsLength = chars.length;
+    if (charsLength > 256) {
+        throw new Error("Argument 'chars' should not have more than 256 characters"
+            + ", otherwise unpredictability will be broken");
+    }
+
+    const randomBytes = crypto.randomBytes(length);
+    const result = new Array(length);
+
+    let cursor = 0;
+    for (let i = 0; i < length; i++) {
+        cursor += randomBytes[i];
+        result[i] = chars[cursor % charsLength];
+    }
+
+    return result.join("");
+}
+
+/** Sync */
+export function generateRandomASCII(length: number) {
+    return randomString(length,
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 }
 
 /**
@@ -300,7 +333,7 @@ export function logChildProcess(process: child_process.ChildProcess, logger: Log
     });
 
     process.stderr?.on('data', (chunk) => {
-        logger.error(chunk.toString('utf-8'));
+        logger.warn(chunk.toString('utf-8'));
     });
 }
 
@@ -310,7 +343,7 @@ export function logSyncChildProcess(childProcessOutput: child_process.SpawnSyncR
     }
 
     if (childProcessOutput.stderr) {
-        logger.error(childProcessOutput.stderr.toString('utf-8'));
+        logger.warn(childProcessOutput.stderr.toString('utf-8'));
     }
 }
 
@@ -388,7 +421,7 @@ export function spawnChildProcessSync(command: string, args: any[], spawnOptions
     return childProcess;
 }
 
-export function excludePropertiesFromObject(obj: object, exclude: Set<string>) {
+export function excludePropertiesFromObject(obj: object, exclude: Set<string>): Partial<object> {
     const filtered = Object.fromEntries(Object.entries(obj).filter(e => !exclude.has(e[0])));
 
     return filtered;
