@@ -11,6 +11,7 @@ export interface ImagineInterface {
     export_image_name: string;
     export_image_size: number;
     export_image_size_string?: string;
+    export_image_exif_tags?: ExifReader.ExifTags;
     image_id: string;
     image_metadata_string: string;
     image_category: string;
@@ -37,6 +38,7 @@ export interface ProcessedImagesMetadata {
     sourceName: string,
     sourcePath: string,
     sourceSize: number;
+    sourceEXIFTags: ExifReader.ExifTags;
     sourceDateCreated: Date;
     category: string,
     exportImageID: string,
