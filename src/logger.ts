@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs/promises';
-import dayjs from 'dayjs';
 import path from 'path';
 import pino from 'pino';
 import chalk from 'chalk';
@@ -9,6 +8,7 @@ import { APP_VERSION, FORMATTED_DATES, IS_ENV, IS_PROCESS_CHILD, PROCESS_START_T
 import { convertCircularObject, removeANSI } from './util';
 import BaseLoggerConfig, { logLevels } from './config/logger.config';
 import type { LoggerType, FastifyRequestSimple, LoggingMetadata, LoggingOptions, ProcessLoggerTime } from './config/logger.config';
+import { DateTime } from "luxon";
 
 /** Only call a log time for the process' logging directory once and store use that time throughout the logger,
  *  as opposed to calling ````FORMATTED_DATES.CURRENT_TIME_LOG()```` multiple times
@@ -18,7 +18,7 @@ let permanantLogDirectoryTime = PROCESS_START_TIME;
 if (IS_PROCESS_CHILD) {
     process.on('message', (message) => {
         const processMessage = message as ProcessLoggerTime;
-        const isLoggerMessage = Object.hasOwn(processMessage, 'type') && Object.hasOwn(processMessage as unknown as object, 'value');
+        const isLoggerMessage = Object.hasOwn(processMessage, 'type') && Object.hasOwn(processMessage, 'value');
 
         if (isLoggerMessage) {
             permanantLogDirectoryTime = processMessage.value as string;
@@ -80,6 +80,7 @@ export default class Logger {
             pid: process.pid,
             environment: environment,
             version: APP_VERSION.versionString,
+            nodeVersion: process.version,
             platform: process.platform,
             level: options.logLevel.level,
             levelName: options.logLevel.levelName,
@@ -100,11 +101,13 @@ export default class Logger {
                 const fastifyData = loggingMetadata.message;
 
                 // Don't log base64 image strings
+                // NOTE: Better way to do this is to have a max size for data to log and ignore anything that
+                // exceeeds the max size in bytes. So images probably won't be logged, ya know
                 let requestBody = fastifyData.res?.request.body;
                 if (requestBody && requestBody.includes('base64') && requestBody.includes('image')) {
                     requestBody = JSON.parse(requestBody);
 
-                    const base64meta = requestBody.dataURL.split(',')[0];
+                    const base64meta = requestBody.dataURL?.split(',')[0];
                     requestBody.dataURL = base64meta;
 
                     requestBody = JSON.stringify(requestBody);
@@ -114,6 +117,7 @@ export default class Logger {
                     id: fastifyData.res?.request.id,
                     statusCode: fastifyData.res?.raw?.statusCode,
                     protocol: fastifyData.res?.request.protocol,
+                    headers: !IS_ENV.production ? fastifyData.res?.request.headers : null,
                     ip: fastifyData.res?.request.ip,
                     method: fastifyData.res?.request.method,
                     responseTime: fastifyData?.responseTime,
@@ -121,7 +125,6 @@ export default class Logger {
                     query: fastifyData.res?.request.query,
                     body: requestBody,
                     url: fastifyData.res?.request.url,
-                    ips: fastifyData.res?.request.ips,
                     timeout: fastifyData.res?.request.socket.timeout ?? fastifyData.res?.request.connection.timeout,
                     peername: fastifyData.res?.request.socket._peername ?? fastifyData.res?.request.connection._peername,
                     statusMessage: fastifyData.res?.raw?.statusMessage,
@@ -151,7 +154,7 @@ export default class Logger {
             return message;
         });
 
-        let prettyPrintedLogString = `${this.name} ${metadataSeperator} ${loggingMetadata.pid} ${metadataSeperator} ${loggingMetadata.environment} ${metadataSeperator} ${loggingMetadata.version} ${metadataSeperator} ${loggingMetadata.platform} ${metadataSeperator} [${loggingMetadata.date}] ${options.logLevel.nameStyled.trim()} ${loggingMetadata.emoji.trim()} ${metadataSeperator} ${loggingMetadata.loggerType.toUpperCase()} ${metadataSeperator} "${prettyPrintedMessage}" ${prettyPrintedOptionalMessages.join(' ')}\n`;
+        let prettyPrintedLogString = `${this.name} ${metadataSeperator} ${loggingMetadata.pid} ${metadataSeperator} ${loggingMetadata.environment} ${metadataSeperator} ${loggingMetadata.nodeVersion} ${metadataSeperator} ${loggingMetadata.version} ${metadataSeperator} ${loggingMetadata.platform} ${metadataSeperator} [${loggingMetadata.date}] ${options.logLevel.nameStyled.trim()} ${loggingMetadata.emoji.trim()} ${metadataSeperator} ${loggingMetadata.loggerType.toUpperCase()} ${metadataSeperator} "${prettyPrintedMessage}" ${prettyPrintedOptionalMessages.join(' ')}\n`;
 
         // Add trace stack to logging metadata and pretty printed log string if trace is enabled
         if (options.trace) {
@@ -221,7 +224,7 @@ export default class Logger {
             } else if (typeof message === 'boolean') {
                 return chalk.cyanBright(message);
 
-            } else if (dayjs(message).isValid() && typeof message !== 'number' && message !== undefined) {
+            } else if (DateTime.fromJSDate(new Date(message)).isValid && typeof message !== 'number' && message !== undefined) {
                 return chalk.yellow(message);
             }
 
