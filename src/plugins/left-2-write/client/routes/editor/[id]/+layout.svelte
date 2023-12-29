@@ -1,43 +1,20 @@
 <script>
-	import { onMount } from "svelte";
-	import "../../../static/css/main.css";
+	import { page } from "$app/stores";
 </script>
 
 <div id="header-top">
 	<header id="header">
-		<!-- <a id="logo-container" title="Home" href="/" data-sveltekit-reload>
-			<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330.04 1343.15"
-				><defs
-					><style>
-						.d {
-							fill: none;
-							stroke: #000;
-							stroke-miterlimit: 10;
-							stroke-width: 60px;
-						}
-					</style></defs
-				><g id="a" /><g id="b"
-					><g id="c"
-						><ellipse cx="719.42" cy="200" rx="199.95" ry="199.95" /><ellipse
-							cx="200"
-							cy="629.24"
-							rx="199.95"
-							ry="199.95"
-						/><ellipse cx="973.33" cy="1005.37" rx="119.97" ry="119.96" /><line
-							class="d logo-lines"
-							x1="1311.8"
-							y1="253.11"
-							x2="973.33"
-							y2="1005.37"
-						/><line class="d logo-lines" x1="973.33" y1="1005.37" x2="212.76" y2="1324.71" /></g
-					></g
-				></svg
-			>
-		</a> -->
 		<a href="/" id="lf-home-text" title="Home" class="header-text-container" data-sveltekit-reload>Home</a>
 		<div id="lf-story-history-container" class="header-text-container">
 			<div>Story History</div>
 		</div>
+		<a
+			id="lf-quill-link"
+			href={$page.url.href.replace("editor/", "new-editor/")}
+			class="header-text-container"
+			data-sveltekit-reload
+			>New Editor
+		</a>
 	</header>
 	<div id="toolbar">
 		<!-- Add font size dropdown -->
@@ -136,6 +113,13 @@
 		top: 0;
 		z-index: 1;
 		/* box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2); */
+	}
+
+	#lf-quill-link {
+		position: absolute;
+		right: 0px;
+		border-left: 1px solid var(--border-colour);
+		border-right: 0px;
 	}
 
 	/* .logo {

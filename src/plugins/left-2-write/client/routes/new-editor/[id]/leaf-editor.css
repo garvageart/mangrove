@@ -1,0 +1,183 @@
+.ProseMirror {
+    outline: none;
+}
+
+.ProseMirror-selectednode {
+    outline: 2px solid rgb(78, 178, 255);
+}
+
+.ProseMirror-hideselection *::selection {
+    background: var(--almost-black);
+}
+
+.ProseMirror-hideselection img::selection,
+button,
+input {
+    background: transparent
+}
+
+.ProseMirror-hideselection *::-moz-selection {
+    background: var(--almost-black);
+}
+
+.ProseMirror .placeholder::before {
+    color: gray;
+    cursor: text;
+    pointer-events: none;
+    float: left;
+    height: 0;
+}
+
+.ProseMirror p > span.placeholder::before {
+    content: "Start writing...";
+}
+
+.ProseMirror #lf-title span.placeholder::before {
+    content: "Add a title...";
+}
+
+/* .ProseMirror #lf-title span[data-content-node] {
+    background-image: linear-gradient(transparent calc(100% - 1px), hsl(0, 0%, 0%));
+    background-size: 1px 52px
+} */
+
+.ProseMirror #lf-summary span.placeholder::before {
+    content: "Add a summary...";
+}
+
+.ProseMirror .lf-post-metadata span.placeholder::before {
+    content: "Add some metadata...";
+    cursor: auto;
+}
+
+.ProseMirror .placeholder::after,
+.ProseMirror p span.placeholder::after {
+    display: none;
+}
+
+
+#lf-title span {
+    /* display: inline-block; */
+    min-width: 1px;
+}
+
+#lf-body {
+    font-size: 0.6em;
+    border: 0px solid #ccc;
+    padding: 1.5em 0in 4em 0in;
+}
+
+#lf-body h2 {
+    font-size: 1.5em;
+}
+
+/* #lf-body p {
+    margin-bottom: 1em;
+} */
+
+#lf-body img {
+    max-width: 100%;
+}
+
+#lf-body a {
+    color: #06c;
+    text-decoration: underline;
+}
+
+#lf-body a:hover {
+    text-decoration: none;
+}
+
+#lf-body blockquote {
+    font-size: 1.2em;
+    margin: 0.5em auto;
+    font-style: italic;
+    padding: 1.2em 30px 1.2em 75px;
+    position: relative;
+    color: var(--grey);
+    font-style: italic;
+    border-left: 4px solid #ccc;
+}
+
+#lf-body blockquote::before {
+    content: "\201C";
+    color: var(--almost-black);
+    font-size: 4em;
+    position: absolute;
+    left: 10px;
+    top: -10px;
+}
+
+#lf-body blockquote > p {
+    margin-bottom: 0em;
+}
+
+/* #lf-body blockquote::after {
+    content: "\201D";
+    color: var(--almost-black);
+    font-size: 4em;
+    position: absolute;
+    margin: 0em auto;
+    top: 10px;
+} */
+
+#lf-body hr {
+    margin: 1em 0em;
+}
+
+#lf-body li {
+    margin: 0em 2em;
+}
+
+#lf-body li > p {
+    margin-bottom: 0.5em;
+    margin-top: 0.25em;
+}
+
+#lf-body blockquote span {
+    display: block;
+    color: #333333;
+    font-style: normal;
+    font-weight: bold;
+    margin-top: 1em;
+}
+
+#lf-body pre {
+    background-color: #23241f;
+    color: #f8f8f2;
+    overflow: visible;
+    white-space: pre-wrap;
+    margin: 1em 0em;
+    padding: 1em 1em;
+    border-radius: 6px;
+}
+
+#lf-body pre > code {
+    background-color: transparent;
+    padding: 0px 0px;
+}
+
+#lf-body pre > code::selection,
+#lf-body code > *::selection {
+    background-color: #43454f;
+    color: #e2e4e5;
+}
+
+#lf-body code {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 85%;
+    background-color: #d6d6d6;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.lf-img-uploading img {
+    max-width: 98% !important;
+    filter: blur(5px);
+    opacity: 0.3;
+}
+
+/* #lf-body mark {
+    color: white;
+    background-color: #fde24a;
+} */

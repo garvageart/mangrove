@@ -55,14 +55,7 @@
 			inactiveTimer = setTimeout(fn, time);
 		}
 
-		const events: Array<keyof DocumentEventMap> = [
-			"mousedown",
-			"mousemove",
-			"keypress",
-			"scroll",
-			"touchstart",
-			"focus"
-		];
+		const events: Array<keyof DocumentEventMap> = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "focus"];
 
 		events.forEach((event) => {
 			document.addEventListener(event, resetTimer, true);
@@ -130,7 +123,17 @@
 			theme: "snow"
 		});
 
-		editor.setContents(data.postData.l2w_ql_deltas);
+		const quillSaveDate = new Date(data.postData.l2w_quill_save_date).getTime();
+		const pmSaveDate = new Date(data.postData.l2w_pm_save_date).getTime();
+
+		if (quillSaveDate < pmSaveDate || !quillSaveDate) {
+			if (data.postData.l2w_raw_html) {
+				editor.clipboard.dangerouslyPasteHTML(data.postData.l2w_raw_html);
+				saveDocument();
+			}
+		} else if (data.postData.l2w_quill_save_date) {
+			editor.setContents(data.postData.l2w_ql_deltas);
+		}
 
 		function saveDocument() {
 			$lastSavedAt = new Date();
@@ -140,6 +143,7 @@
 				l2w_ql_deltas: editor.getContents(),
 				l2w_raw_html: editor.root.innerHTML,
 				l2w_last_saved_at: $lastSavedAt,
+				l2w_quill_save_date: $lastSavedAt,
 				l2w_plain_text: editor.getText(),
 				l2w_title: postTitle.innerText.trim()
 			} as ILeft2Write);
@@ -254,8 +258,8 @@
 	<link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css" />
 	<link rel="stylesheet" href="../css/editor.css" />
 	<!-- <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script> -->
-
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" />
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/snazzy.css" /> -->
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css" /> -->
 </svelte:head>
 
 <div id="main-container">
@@ -263,18 +267,14 @@
 	<div id="left-sidebar" class="editor-sidebar">
 		<div id="lf-md-word_count">0 Words</div>
 		<Seperator />
-		<Metadata
-			title="Date Created"
-			subtitle={dayjs(data.postData.createdAt).format("DD/MM/YYYY — HH:mm")}
-			showSeperator={false}
-		/>
+		<Metadata title="Date Created" subtitle={dayjs(data.postData.createdAt).format("DD/MM/YYYY — HH:mm")} showSeperator={false} />
 	</div>
 	<div id="editor-container">
 		<div id="editor-header">
 			<span id="title" role="textbox" contenteditable />
 			<div id="editor-post-metadata">
 				<h3 id="lf-author">Written by: {data.postData.l2w_author}</h3>
-				<h3 id="lf-last-saved">
+				<h3 id="lf-last_saved">
 					Last Saved: <strong>{convertDate(new Date($lastSavedAt))}</strong>
 				</h3>
 			</div>
@@ -381,7 +381,7 @@
 
 	#editor-post-metadata > h3 {
 		margin-bottom: 0px;
-				font-size: 1em;
+		font-size: 1em;
 		font-weight: 500;
 	}
 
