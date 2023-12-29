@@ -26,6 +26,7 @@ credentials
 
 #Specified Files
 package-lock.json
+bun.lockb
 
 #File Name Patterns
 archive.js*
