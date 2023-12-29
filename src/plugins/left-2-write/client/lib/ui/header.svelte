@@ -1,9 +1,6 @@
 <header id="header">
 	<a id="logo-container" href="/">
-		<svg
-			class="logo"
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 1330.04 1343.15"
+		<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330.04 1343.15"
 			><defs
 				><style>
 					.d {
@@ -26,20 +23,14 @@
 						y1="253.11"
 						x2="973.33"
 						y2="1005.37"
-					/><line
-						class="d logo-lines"
-						x1="973.33"
-						y1="1005.37"
-						x2="212.76"
-						y2="1324.71"
-					/></g
+					/><line class="d logo-lines" x1="973.33" y1="1005.37" x2="212.76" y2="1324.71" /></g
 				></g
 			></svg
 		>
 	</a>
+	<span id="dashboard-title">Dashboard</span>
+	<slot name="new-post-button" />
 </header>
-
-<!-- <slot /> -->
 
 <style>
 	#header {
@@ -50,6 +41,8 @@
 		justify-content: left;
 		display: flex;
 		background-color: #f8f8f8;
+		position: sticky;
+		top: 0px;
 	}
 
 	.logo {
@@ -66,5 +59,11 @@
 		background-color: #111111;
 		width: 2em;
 		height: 2em;
+	}
+	
+	#dashboard-title {
+		font-family: 'Moret', Times, serif;
+		font-weight: 700;
+		margin-left: 1em;
 	}
 </style>
