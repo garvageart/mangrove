@@ -275,13 +275,21 @@ export const left2Write = new MDBSchema<ILeft2Write>({
         type: String,
         required: true
     },
-    l2w_description: {
+    l2w_summary: {
         type: String,
         required: false
     },
     l2w_last_saved_at: {
         type: Date,
         required: true
+    },
+    l2w_pm_save_date: {
+        type: Date,
+        required: false
+    },
+    l2w_quill_save_date: {
+        type: Date,
+        required: false
     },
     l2w_plain_text: {
         type: String,
@@ -292,6 +300,10 @@ export const left2Write = new MDBSchema<ILeft2Write>({
         required: false
     },
     l2w_ql_deltas: {
+        type: Object,
+        required: false
+    },
+    l2w_pm_state: {
         type: Object,
         required: false
     },
@@ -311,12 +323,20 @@ export const left2Write = new MDBSchema<ILeft2Write>({
         type: String,
         required: false
     },
+    l2w_wf_published_on_staged_only: {
+        type: Boolean,
+        required: false
+    },
     l2w_title: {
         type: String,
         required: true
     },
     l2w_thumbnail: {
         type: String,
+        required: false
+    },
+    l2w_post_history: {
+        type: [],
         required: false
     }
 }, { timestamps: true });
