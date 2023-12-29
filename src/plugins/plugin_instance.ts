@@ -9,7 +9,7 @@ import type { ConnectToDbOptions } from "../types/db.service";
 import { msToSeconds, secondsToMs, sleep } from "../util";
 import { DatabaseService } from "../services/db.service";
 
-export default class PluginInstance<FlowStateSchema, PluginInterface, ClientInterface>  {
+export default abstract class PluginInstance<FlowStateSchema, PluginInterface, ClientInterface>  {
     protected client: ClientInterface | undefined;
     protected colour: string;
     collectionName: string;
@@ -80,7 +80,7 @@ export default class PluginInstance<FlowStateSchema, PluginInterface, ClientInte
             localhostFallback: MONGODB_FALLBACK_LOCALLY
         });
 
-        this.logger = new Logger(this.pluginName, 'plugin');
+        this.logger = new Logger(IS_ENV.production ? this.collectionName : this.pluginName, 'plugin');
         this.pluginColour = chalk.hex(this.colour);
     }
 
@@ -139,7 +139,7 @@ export default class PluginInstance<FlowStateSchema, PluginInterface, ClientInte
             const timeToRetry = options.retryTimeout ?? 5000;
 
             for (let i = retryCounterStart; i < retryLimit + 1; i++) {
-                this.logger.error(`Retrying connection in ${msToSeconds(timeToRetry)} seconds...`);
+                this.logger.warn(`Retrying connection in ${msToSeconds(timeToRetry)} seconds...`);
                 await sleep(timeToRetry);
 
                 try {
