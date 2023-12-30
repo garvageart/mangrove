@@ -17,7 +17,7 @@
 				"name": "Launch Program",
 				"program": "${workspaceFolder}/src/addons/cryptographer.addon.ts",
 				"runtimeArgs": [
-					"--loader",
+					"--import",
 					"tsx"
 				],
 				"request": "launch",

@@ -59,7 +59,7 @@ export default class MusePlugin extends PluginInstance<FlowStateMuse, IMuseSpoti
         this.logger.info('Launching temporary authentication server. Please wait...');
 
         const tempServer = forkChildProcess('src/plugins/muse/muse_auth_server.ts', ['child'], {
-            execArgv: ['--loader', 'tsx'],
+            execArgv: ['--import', 'tsx'],
             cwd: process.cwd(),
         }, this.logger);
 
