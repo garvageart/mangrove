@@ -143,7 +143,7 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
 
         case 'Launch File Server': {
             const fileServerProcess = forkChildProcess('src/plugins/imagine/imagine_server.ts', ['child'], {
-                execArgv: ['--loader', 'tsx'],
+                execArgv: ['--import', 'tsx'],
                 cwd: process.cwd(),
             }, logger);
 
@@ -154,7 +154,7 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
 
         case 'Launch Spotify Authorization Server': {
             const spotifyServerProcess = forkChildProcess('src/plugins/muse/muse_auth_server.ts', ['child'], {
-                execArgv: ['--loader', 'tsx'],
+                execArgv: ['--import', 'tsx'],
                 cwd: process.cwd(),
             }, logger);
 

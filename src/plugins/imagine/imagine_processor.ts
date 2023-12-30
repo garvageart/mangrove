@@ -471,7 +471,7 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
         }
 
         const imageServer = forkChildProcess('src/plugins/imagine/imagine_server.ts', ['child'], {
-            execArgv: ['--loader', 'tsx'],
+            execArgv: ['--import', 'tsx'],
             cwd: process.cwd(),
         }, this.logger);
 
