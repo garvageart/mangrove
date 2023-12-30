@@ -128,3 +128,15 @@ export const sleep = (time: number) => new Promise(resolve => setTimeout(resolve
 export function isBetween(val: number, min: number, max: number) {
     return val >= min && val <= max;
 }
+
+export function constructServiceURLs(url: string) {
+    if (process.platform === 'win32' || navigator.userAgent.toLowerCase().includes('windows')) {
+        const urlObject = new URL(url);
+        const newHostNameArray = urlObject.hostname.split(".");
+        newHostNameArray.splice(1, 0, "dev");
+
+        return `${urlObject.protocol}//${newHostNameArray.join(".")}`;
+    }
+
+    return url;
+}
