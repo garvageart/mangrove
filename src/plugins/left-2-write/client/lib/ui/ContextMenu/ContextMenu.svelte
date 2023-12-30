@@ -3,30 +3,14 @@
     Inspiration code from: https://svelte.dev/repl/6fb90919e24942b2b47d9ad154386b0c?version=3.49.0
 -->
 <script lang="ts">
-	import { SvelteComponent, createEventDispatcher, onMount, setContext } from "svelte";
 	import MenuItem from "./ContextMenuItem.svelte";
-	import type ContextMenu from "./ContextMenu.svelte";
-	import { key } from "./menuKey";
-	import type { MouseEventHandler } from "svelte/elements";
-	import { dev } from "$app/environment";
 	import type { ILeft2WriteMenuOptions } from "../../../../../../types/plugins/l2w.types";
-
-	const dispatch = createEventDispatcher();
+	
 	let contextMenu: HTMLDivElement;
 
-	// export let outer = true;
-	// export let contextMenuComp: ContextMenu = null;
 	export let showMenu: boolean = null;
 	export let menuOptions: ILeft2WriteMenuOptions[] = null;
 	export let floating: boolean = null;
-
-	// $: if (dev) {
-	// 	console.log(showMenu);
-	// }
-
-	// setContext(key, {
-	// 	dispatchClick: () => dispatch("click")
-	// });
 	
 	function getContextMenuCoords(node: HTMLElement) {
 		let target = node;
@@ -83,16 +67,10 @@
 <style>
 	#context-menu-options {
 		display: inline-flex;
-		/* border: 1px var(--border-colour) solid; */
 		width: 6.5em;
 		background-color: #242424;
 		color: var(--almost-white);
-		/* border-radius: 10px; */
 		overflow: hidden;
 		flex-direction: column;
 	}
-
-	/* #navbar ul {
-		margin: 6px;
-	} */
 </style>
