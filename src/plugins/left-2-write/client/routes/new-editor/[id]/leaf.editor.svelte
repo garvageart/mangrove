@@ -306,12 +306,15 @@
 
 					if (inputTransactions === 1) {
 						$hasUserInput = true;
-						console.log("starting save");
+
+						if (dev) {
+							console.log("starting save");
+						}
 					}
 
 					let { $from, $to } = state.selection;
 
-					if ($from.pos !== $to.pos) {
+					if (dev && $from.pos !== $to.pos) {
 						console.log("selection from", $from.pos, "to", $to.pos);
 					}
 
