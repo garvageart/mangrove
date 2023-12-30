@@ -16,6 +16,7 @@ const config = {
 		}),
 		alias: {
 			'left-2-write': 'src/plugins/left-2-write/client/*',
+			// "xmlhttprequest-ssl": "node_modules/engine.io-client/lib/xmlhttprequest.js"
 		},
 		files: {
 			routes: 'src/plugins/left-2-write/client/routes',
@@ -25,7 +26,6 @@ const config = {
 			errorTemplate: 'src/plugins/left-2-write/client/error.html'
 		}
 	}
-
 };
 
 export default config;
