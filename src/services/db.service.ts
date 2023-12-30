@@ -146,6 +146,7 @@ export class DatabaseService<DataInterface> {
                 this.logger.info(`Successfully connected to '${options.dbName}' at ${options.uri}:${MONGODB_DEFAULT_PORT}'`);
             }
 
+            this.connection = mongooseInstance.connection;
             return mongooseInstance;
         });
     }
