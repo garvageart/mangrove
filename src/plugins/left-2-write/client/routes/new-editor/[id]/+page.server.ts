@@ -6,5 +6,5 @@ export const load: PageServerLoad = async (loadEvent) => {
     const postID = loadEvent.params.id;
     const postData = await (await loadEvent.fetch(`${L2W_SERVER_HREF}/posts/${postID}`)).json() as unknown as ILeft2Write;
 
-    return { postData, queries: Object.fromEntries(loadEvent.url.searchParams)};
+    return { postData, queries: Object.fromEntries(loadEvent.url.searchParams) };
 };
