@@ -52,8 +52,6 @@
 	const { postData } = data;
 	export let view: EditorView = null;
 	export let state: EditorState = null;
-	// @ts-ignore
-	let isPrinting = false;
 
 	const editorConfig = {
 		schema: leafSchema,
@@ -341,16 +339,6 @@
 		mainElement?.addEventListener("scroll", () => {
 			scrollPosition = mainElement.scrollHeight;
 		});
-		// if (data.queries.print === "true" && isPrinting === false) {
-		// 	if (isPrinting) {
-		// 		return;
-		// 	}
-
-		// 	setTimeout(() => {
-		// 		isPrinting = true;
-		// 		window.print();
-		// 	}, 2000);
-		// }
 
 		return () => {
 			$editorView.destroy();
