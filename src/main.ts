@@ -124,11 +124,11 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
 
         case 'Left-2-Write': {
             const left2WriteBackend = forkChildProcess('src/plugins/left-2-write/server/l2w_client.ts', ['child'], {
-                execArgv: ['--loader', 'tsx'],
+                execArgv: ['--import', 'tsx'],
                 cwd: process.cwd(),
             }, logger);
 
-            const svelteKitProcess = forkChildProcess('build/l2w_svelte_server.js', ['child'], {
+            const svelteKitProcess = forkChildProcess('src/plugins/left-2-write/server/l2w_svelte_server.js', ['child'], {
                 cwd: process.cwd(),
             }, logger);
 
