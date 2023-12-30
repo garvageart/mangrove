@@ -59,9 +59,10 @@
 	},
 	"devDependencies": {
 		"@mrwaip/adapter-fastify": "^0.0.1-next.1",
-		"@sveltejs/adapter-auto": "^2.1.0",
+		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-node": "^2.0.0",
-		"@sveltejs/kit": "^1.24.1",
+		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/inquirer": "^9.0.3",
 		"@types/jquery": "^3.5.18",
 		"@types/luxon": "^3.3.4",
@@ -83,7 +84,7 @@
 		"svelte-eslint-parser": "^0.33.1",
 		"ts-node": "^10.9.1",
 		"tsx": "^3.12.6",
-		"vitest": "^0.34.6"
+		"vitest": "^1.0.0"
 	},
 	"trustedDependencies": [
 		"sharp"
