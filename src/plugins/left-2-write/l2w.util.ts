@@ -1,6 +1,6 @@
+import { addToast } from "left-2-write/lib/ui/notification_toast.store";
 import type { ILeft2Write } from "../../types/plugins/l2w.types";
 import { L2W_SERVER_HREF, L2W_URL_REGEX } from "./l2w.constants";
-import { addToast } from "$lib/ui/notification_toast.store";
 
 export function convertToSentenceCase(text: string, allWords = false) {
     const textToModify: string | string[] = allWords ? text.split(/\s+/,) : text;
