@@ -525,9 +525,3 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         }
     }
 }
-
-const l2w = new L2WServer({
-    port: 7777
-});
-
-l2w.runL2WServer();
