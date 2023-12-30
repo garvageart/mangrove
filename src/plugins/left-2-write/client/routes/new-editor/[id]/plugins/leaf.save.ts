@@ -22,23 +22,23 @@ const savePlugin = new Plugin({
                 }
 
                 // Cancel any saves if only modifier keys are pressed
-                if (event.altKey && event.key.includes('Alt')) {
+                if (event.altKey || event.key.includes('Alt')) {
                     return false;
                 } else if (event.shiftKey && event.key.includes('Shift')) {
                     return false;
-                } else if (event.ctrlKey && event.key.includes('Control')) {
+                } else if (event.ctrlKey || event.key.includes('Control')) {
                     return false;
                 }
-
+                
                 const isUserInputStatus = get(hasUserInput);
-
+                
                 if (!isUserInputStatus) {
                     return false;
                 }
-
+                
                 const timer = savePlugin.spec.timer as ReturnType<typeof setTimeout>;
                 clearTimeout(timer);
-
+                
                 editorStatus.set('saving');
 
                 const updatedContents = get(editorContents);
