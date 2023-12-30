@@ -4,6 +4,7 @@ import type { EditorView } from "prosemirror-view";
 import { dev } from "$app/environment";
 import { showMenu } from "$lib/stores/editor";
 import { get, writable, type Writable } from "svelte/store";
+import { hasParentNode } from "prosemirror-utils";
 
 export const menuComponentStore = writable(null) as Writable<LeafMenu>;
 export const menuViewStore = writable(null) as Writable<MenuView>;
@@ -79,12 +80,14 @@ export class MenuView implements PluginView {
             // paragraphHasContent = currentNode.textContent;
         }
 
-        if (notAllowedNodeTypes.includes(currentNode.type.name)) {
+        const isSelectionInBannedParents = hasParentNode((node) => notAllowedNodeTypes.includes(node.type.name))(selection);
+
+        if (notAllowedNodeTypes.includes(currentNode.type.name) || isSelectionInBannedParents) {
             if (menuComp !== null) {
                 if (dev) {
                     console.log("i'm running here");
                 }
-                
+
                 this.componentDestroy();
             }
 
