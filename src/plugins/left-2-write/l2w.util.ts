@@ -1,4 +1,4 @@
-import { addToast } from "left-2-write/lib/ui/notification_toast.store";
+import { addToast } from "./client/lib/ui/notification_toast.store";
 import type { ILeft2Write } from "../../types/plugins/l2w.types";
 import { L2W_SERVER_HREF, L2W_URL_REGEX } from "./l2w.constants";
 
