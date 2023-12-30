@@ -6,7 +6,7 @@ import { dev } from "$app/environment";
 import { page } from "$app/stores";
 import type { PageData } from "./$types";
 import { convertDate } from "../../../../l2w.util";
-import { L2W_SERVER_HREF, L2W_URL_REGEX } from "../../../../l2w.constants";
+import { L2W_SERVER_HREF } from "../../../../l2w.constants";
 import { addToast } from "left-2-write/lib/ui/notification_toast.store";
 import { get } from "svelte/store";
 import { PUBLIC_WEBSITE_DOMAIN_NAME, PUBLIC_WEBSITE_STAGING_DOMAIN_NAME } from "$env/static/public";
@@ -221,11 +221,4 @@ export function nodeToElement(node: Node, schema: Schema) {
 	tempDiv.appendChild(fragment);
 
 	return tempDiv;
-}
-
-export function convertTextURLsToHref(text: string) {
-	const urlRegex = L2W_URL_REGEX;
-	return text.replaceAll(urlRegex, (url) => {
-		return `<a href="${url}">${url}</a>`;
-	});
 }

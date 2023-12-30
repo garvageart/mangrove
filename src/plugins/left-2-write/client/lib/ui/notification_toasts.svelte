@@ -2,7 +2,14 @@
 	import { fade } from "svelte/transition";
 	import { dismissToast, toasts } from "./notification_toast.store";
 	import CloseIcon from "./CloseIcon.svelte";
-	import { convertTextURLsToHref } from "left-2-write/routes/new-editor/[id]/leaf.utils";
+
+	function convertTextURLsToHref(text: string) {
+		const urlRegex = L2W_URL_REGEX;
+		
+		return text.replaceAll(urlRegex, (url) => {
+			return `<a href="${url}">${url}</a>`;
+		});
+}
 </script>
 
 {#if $toasts}
