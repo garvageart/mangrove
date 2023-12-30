@@ -166,6 +166,7 @@
 		flex-direction: column;
 		align-self: flex-start;
 		max-width: 7em;
+		min-width: 7em;
 	}
 
 	#lf-md-word_count {
