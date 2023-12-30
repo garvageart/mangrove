@@ -9,6 +9,7 @@ import { forkChildProcess, getClassMethods } from "./util";
 import MusePlugin from "./plugins/muse/muse_client";
 import { L2W_EDITOR_HREF } from "./plugins/left-2-write/l2w.constants";
 import type child_process from "child_process";
+import { L2WServer } from "./plugins/left-2-write/server/l2w_client";
 
 const logger = GeneralLogger;
 
@@ -123,19 +124,19 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
         }
 
         case 'Left-2-Write': {
-            const left2WriteBackend = forkChildProcess('src/plugins/left-2-write/server/l2w_client.ts', ['child'], {
-                execArgv: ['--import', 'tsx'],
-                cwd: process.cwd(),
-            }, logger);
+            const left2Write = new L2WServer({
+                port: 7777
+            });
+
+            left2Write.runL2WServer();
 
             const svelteKitProcess = forkChildProcess('src/plugins/left-2-write/server/l2w_svelte_server.js', ['child'], {
                 cwd: process.cwd(),
             }, logger);
 
-            childProcesses.push(left2WriteBackend);
             childProcesses.push(svelteKitProcess);
 
-            logger.info(`Open Leaf editor at ${L2W_EDITOR_HREF}`);
+            logger.info(`Open Leaf editor at ${left2Write.pluginColour(L2W_EDITOR_HREF)}`);
 
             break;
         }
@@ -147,7 +148,7 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
             }, logger);
 
             childProcesses.push(fileServerProcess);
-            
+
             break;
         }
 
