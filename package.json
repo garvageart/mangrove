@@ -12,6 +12,7 @@
 		"l2w-dev": "vite dev --host",
 		"l2w-build": "vite build",
 		"l2w-preview": "vite preview --host",
+		"l2w-start": "node src/plugins/left-2-write/server/l2w_svelte_server.js",
 		"l2w-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"l2w-check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
