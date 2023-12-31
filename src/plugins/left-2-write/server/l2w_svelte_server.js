@@ -16,6 +16,6 @@ fastifyClient.get('/healthcheck', (req, res) => {
 
 fastifyClient.register(plugin);
 
-fastifyClient.listen({ host: "0.0.0.0", port: parseInt(process.env.LEAF_SVELTEKIT_PORT) }, () => {
+fastifyClient.listen({ host: process.env.LEAF_SVELTEKIT_HOST, port: parseInt(process.env.LEAF_SVELTEKIT_PORT) }, () => {
     console.log(`SvelteKit is listening on ${process.env.LEAF_SVELTEKIT_PORT}`);
 });
