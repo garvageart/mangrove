@@ -5,7 +5,7 @@ import { DatabaseService } from "./services/db.service";
 import { IS_ENV, MONGODB_FALLBACK_LOCALLY } from "./globals";
 import { ImaginePlugin } from "./plugins/imagine/imagine_processor";
 import { WebflowService } from "./services/webflow.service";
-import { forkChildProcess, getClassMethods } from "./util";
+import { execChildProcess, forkChildProcess, getClassMethods } from "./util";
 import MusePlugin from "./plugins/muse/muse_client";
 import { L2W_EDITOR_HREF } from "./plugins/left-2-write/l2w.constants";
 import type child_process from "child_process";
@@ -130,9 +130,9 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
 
             left2Write.runL2WServer();
 
-            const svelteKitProcess = forkChildProcess('src/plugins/left-2-write/server/l2w_svelte_server.js', ['child'], {
-                cwd: process.cwd(),
-            }, logger);
+            // Using exec instead of fork shows the logger correctly in this instance,
+            // since the SvelteKit server doesn't use the logger normal mangrove logger (written in TypeScript)
+            const svelteKitProcess = execChildProcess('node src/plugins/left-2-write/server/l2w_svelte_server.js', logger);
 
             childProcesses.push(svelteKitProcess);
 
