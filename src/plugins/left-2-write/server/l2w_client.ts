@@ -457,7 +457,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             }
         });
 
-        fastifyClient.listen({ port: L2W_SERVER_PORT }, (error) => {
+        fastifyClient.listen({ host: IS_ENV.production ? "0.0.0.0" : "127.0.0.1", port: L2W_SERVER_PORT }, (error) => {
             if (error) {
                 this.logger.info('An error occured running the server:', error);
             }
@@ -483,9 +483,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             });
 
             socket.on("save-document", async (contents: ILeft2Write, acknowledge) => {
-                // await sleep(4000);
-                // return;
-
                 await this.dbs.updateDocument({ l2w_id: contents.l2w_id }, contents)
                     .then((updatedDocument) => {
                         if (!updatedDocument) {
@@ -525,3 +522,9 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         }
     }
 }
+
+// const l2w = new L2WServer({
+//     port: 7777
+// });
+
+// l2w.runL2WServer();
