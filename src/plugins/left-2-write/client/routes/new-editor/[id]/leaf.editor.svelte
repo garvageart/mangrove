@@ -369,11 +369,12 @@
 		display: flex;
 		flex-direction: column;
 		background-color: var(--almost-white);
+		width: 50%;
 		max-width: 210mm;
 		min-height: 297mm;
 		border: 1px solid #ccc;
 		position: relative;
 		padding: 0in 1.2in;
-		margin: 0em 4em 2em 4em;
+		margin: 0 0em 2em;
 	}
 </style>
