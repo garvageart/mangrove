@@ -2,8 +2,8 @@
 	import { editorState, editorView } from "$lib/stores/editor";
 	import { toggleMark } from "prosemirror-commands";
 	import { MarkType, NodeType } from "prosemirror-model";
-	import type { Command, EditorState, Transaction } from "prosemirror-state";
-	import { writable, type Writable } from "svelte/store";
+	import type { Command } from "prosemirror-state";
+	import { writable } from "svelte/store";
 	import { canInsert, canMark, isNode, markActive } from "./leaf.menu_commands";
 	import { onMount } from "svelte";
 	import leafSchema from "left-2-write/routes/new-editor/[id]/editor/leaf.schema";

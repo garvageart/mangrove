@@ -2,9 +2,7 @@
 	import type { Writable } from "svelte/store";
 	import { useNodeViewContext } from "../editor/leaf.nodeview";
 	import type { Node } from "prosemirror-model";
-	import { getContext, onMount, setContext } from "svelte";
-	import type { EditorView } from "prosemirror-view";
-	import { objectToAttrs } from "../leaf.utils";
+	import { setContext } from "svelte";
 	import { dev } from "$app/environment";
 	import Image from "$lib/editor/leaf.image.svelte";
 

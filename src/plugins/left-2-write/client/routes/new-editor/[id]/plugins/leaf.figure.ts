@@ -1,7 +1,6 @@
 import { Fragment, Slice } from "prosemirror-model";
 import { Plugin, TextSelection } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
-import { getContext, onMount } from "svelte";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
