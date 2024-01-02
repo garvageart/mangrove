@@ -71,7 +71,7 @@
 		const status = postData.l2w_wf_post_status === "published" ? "Unpublish" : "Publish";
 		menuOptions.unshift({
 			itemName: status,
-			async action(event: CustomEvent) {
+			async action() {
 				const action = status.toLowerCase() as PostAction;
 				await publishPost(action);
 			}
@@ -80,7 +80,8 @@
 		menuOptions.push({
 			itemName: "Open on Website",
 			action() {
-				const postHref = dev ? PUBLIC_WEBSITE_STAGING_DOMAIN_NAME : PUBLIC_WEBSITE_DOMAIN_NAME;
+				const postHref =
+					postData.l2w_wf_published_on_staged_only || dev ? PUBLIC_WEBSITE_STAGING_DOMAIN_NAME : PUBLIC_WEBSITE_DOMAIN_NAME;
 				open(`https://${postHref}/posts/${postData.l2w_slug}`, "_blank", "noopener, noreferrer");
 			}
 		});
