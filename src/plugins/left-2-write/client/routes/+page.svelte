@@ -15,7 +15,6 @@
 	import { PUBLIC_WEBSITE_DOMAIN_NAME, PUBLIC_WEBSITE_STAGING_DOMAIN_NAME } from "$env/static/public";
 
 	export let data: PageData;
-	const websiteDomain = dev ? PUBLIC_WEBSITE_STAGING_DOMAIN_NAME : PUBLIC_WEBSITE_DOMAIN_NAME;
 	let dateSortedPosts = data.posts.sort((a, b) => {
 		return new Date(b.l2w_last_saved_at).getTime() - new Date(a.l2w_last_saved_at).getTime();
 	});
@@ -116,6 +115,8 @@
 								{convertToSentenceCase(post.l2w_wf_post_status)}
 							</h2>
 							{#if post.l2w_wf_post_status === "published" && post.l2w_slug}
+								{@const websiteDomain =
+									post.l2w_wf_published_on_staged_only || dev ? PUBLIC_WEBSITE_STAGING_DOMAIN_NAME : PUBLIC_WEBSITE_DOMAIN_NAME}
 								<a
 									id="post-website-link"
 									rel="noopener noreffer"
