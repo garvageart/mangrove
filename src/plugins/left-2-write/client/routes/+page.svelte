@@ -12,9 +12,10 @@
 	import { syncPostData } from "./new-editor/[id]/leaf.utils";
 	import Toasts from "$lib/ui/notification_toasts.svelte";
 	import { writable } from "svelte/store";
+	import { PUBLIC_WEBSITE_DOMAIN_NAME, PUBLIC_WEBSITE_STAGING_DOMAIN_NAME } from "$env/static/public";
 
 	export let data: PageData;
-	const websiteDomain = dev ? data.stagingDomain : L2W_EDITOR_HREF;
+	const websiteDomain = dev ? PUBLIC_WEBSITE_STAGING_DOMAIN_NAME : PUBLIC_WEBSITE_DOMAIN_NAME;
 	let dateSortedPosts = data.posts.sort((a, b) => {
 		return new Date(b.l2w_last_saved_at).getTime() - new Date(a.l2w_last_saved_at).getTime();
 	});
