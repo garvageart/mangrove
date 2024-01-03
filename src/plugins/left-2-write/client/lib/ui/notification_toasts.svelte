@@ -2,6 +2,7 @@
 	import { fade } from "svelte/transition";
 	import { dismissToast, toasts } from "./notification_toast.store";
 	import CloseIcon from "./CloseIcon.svelte";
+	import { L2W_URL_REGEX } from "../../../l2w.constants";
 
 	function convertTextURLsToHref(text: string) {
 		const urlRegex = L2W_URL_REGEX;
