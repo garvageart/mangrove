@@ -144,6 +144,7 @@ export const buildMarksKeymap = (schema: Schema) => {
     marksKeymap["Mod-b"] = toggleMark(schema.marks.strong);
     marksKeymap["Mod-i"] = toggleMark(schema.marks.em);
     marksKeymap["Mod-u"] = toggleMark(schema.marks.underline);
+    marksKeymap["Mod-Shift-K"] = toggleMark(schema.marks.link);
     marksKeymap["Mod-Shift-X"] = toggleMark(schema.marks.strikethrough);
 
     return marksKeymap;
