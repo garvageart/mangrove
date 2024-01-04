@@ -127,6 +127,7 @@
 	main {
 		flex-direction: row;
 		overflow-y: scroll;
+		overflow-x: hidden;
 		display: flex;
 		justify-content: center;
 		max-height: 100%;
@@ -166,7 +167,8 @@
 		flex-direction: column;
 		align-self: flex-start;
 		max-width: 7em;
-		min-width: 7em;
+		min-width: 5em;
+		margin: 0em 2em
 	}
 
 	#lf-md-word_count {
