@@ -138,9 +138,7 @@
 				console.log("Asking server to sync with Webflow");
 			}
 
-			fetch(`${L2W_SERVER_HREF}/sync?postID=${postData.l2w_id}`, {
-				method: "PUT"
-			});
+			syncPostData(postData.l2w_id);
 
 			if (inputTransactions) {
 				saveDocument($editorContents);
