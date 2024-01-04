@@ -10,6 +10,7 @@
 	import { toggleMark } from "prosemirror-commands";
 	import { findMarkPositions, markActive } from "../../leaf.menu_commands";
 	import { addToast } from "$lib/ui/notification_toast.store";
+	import { TextSelection } from "prosemirror-state";
 
 	// All this code needs some refactoring to make it easier to follow
 	// I kinda get what's happening but I am also confused at times 🚶🏾‍♀️
@@ -53,10 +54,48 @@
 		return true;
 	}
 
+	function applyLinkState() {
+		const isValid = validateLink(link);
+		const state = $editorView.state;
+		const { $from, $to } = state.selection;
+		const isActive = markActive(state, linkMark);
+
+		if (!isValid) {
+			return;
+		}
+
+		if (!isActive && !isSelectionEmpty) {
+			toggleMark(linkMark, { href: link, title: linkTitle })(state, $editorView.dispatch, $editorView);
+		} else if (isSelectionEmpty && !embedded) {
+			const transaction = $editorView.state.tr;
+
+			currentMark = linkMark.create(linkAttributes);
+			$editorView.dispatch(transaction.insertText(textToEnter).addMark($from.pos, $from.pos + textToEnter.length, currentMark));
+		} else {
+			currentNode = $from.parent;
+
+			removeMark();
+			const markRange = findMarkPositions(linkMark, state.doc, $from.pos, $to.pos);
+			currentMark = linkMark.create(linkAttributes);
+
+			$editorView.dispatch($editorView.state.tr.addMark(markRange.start, markRange.end, currentMark));
+		}
+
+		const toResolved = $editorState.selection.$to;
+
+		$editorView.dispatch($editorState.tr.setSelection(new TextSelection(toResolved)));
+		toggleMark($editorState.schema.marks.link)($editorState, $editorView.dispatch, $editorView);
+
+		addToast({
+			message: "Link applied"
+		});
+
+		$editorView.focus();
+	}
+
 	$: if (link) {
 		const isValid = isValidUrl(link);
-		const { $from, $to } = $editorState.selection;
-		const isActive = markActive($editorState, linkMark);
+		const { $from } = $editorState.selection;
 		currentNode = $from.parent;
 
 		if (dev) {
@@ -92,10 +131,7 @@
 		const rangeHasMark = markActive($editorState, linkMark);
 
 		if (!isSelectionEmpty || (isSelectionEmpty && !embedded)) {
-			if (dev) {
-				console.log("helooooos");
-			}
-			
+
 			editing = true;
 			return;
 		}
@@ -115,6 +151,14 @@
 		}
 	});
 </script>
+
+<svelte:document
+	on:keyup={(e) => {
+		if (e.code === "Enter") {
+			applyLinkState();
+		}
+	}}
+/>
 
 <LeafPrompt promptTitle="Edit link">
 	<svelte:fragment slot="contents">
@@ -166,63 +210,8 @@
 		{:else}
 			<span class="lf-link_prompt-edit_line">No link provided</span>
 		{/if}
-		<!-- {#if isSelectionEmpty && !embedded}
-			<LeafPromptField placeholder="Add text..." bind:value={textToEnter} />
-			<LeafPromptField placeholder="Add link..." bind:value={link} />
-		{:else if (editing && isSelectionEmpty) || (editing && !isSelectionEmpty) || embedded}
-			<LeafPromptField placeholder="Add link..." bind:value={link} />
-			<LeafPromptField placeholder="Add title..." bind:value={linkTitle} />
-		{:else if link && isValidUrl(link)}
-			<a class="lf-link_prompt-edit_line" title={link} href={link} target="_blank" rel="noreferrer noopener">
-				{link.replace(/(^\w+:|^)\/\//, "").replace(/\/+$/, "")}
-			</a>
-		{:else}
-			<span class="lf-link_prompt-edit_line">No link provided</span>
-		{/if} -->
 		{#if editing}
-			<button
-				id="lf-link_apply_button"
-				on:click={async () => {
-					const isValid = validateLink(link);
-					const state = $editorView.state;
-					const { $from, $to } = state.selection;
-					const isActive = markActive(state, linkMark);
-
-					if (!isValid) {
-						return;
-					}
-
-					if (isSelectionEmpty && !embedded) {
-						const transaction = $editorView.state.tr;
-
-						currentMark = linkMark.create(linkAttributes);
-						$editorView.dispatch(
-							transaction.insertText(textToEnter).addMark($from.pos, $from.pos + textToEnter.length, currentMark)
-						);
-
-						return;
-					}
-
-					if (!isActive) {
-						toggleMark(linkMark, { href: link, title: linkTitle })(state, $editorView.dispatch, $editorView);
-						$editorView.dispatch($editorView.state.tr.insertText(" ", $to.pos + 1, $to.pos + 2));
-					} else {
-						currentNode = $from.parent;
-
-						removeMark();
-						const markRange = findMarkPositions(linkMark, state.doc, $from.pos, $to.pos);
-						currentMark = linkMark.create(linkAttributes);
-
-						$editorView.dispatch($editorView.state.tr.addMark(markRange.start, markRange.end, currentMark));
-					}
-
-					addToast({
-						message: "Link applied"
-					});
-				}}
-			>
-				Apply
-			</button>
+			<button id="lf-link_apply_button" on:click={() => applyLinkState()}> Apply </button>
 		{/if}
 	</svelte:fragment>
 </LeafPrompt>
