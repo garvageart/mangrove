@@ -21,11 +21,10 @@ services:
     volumes:
       - mangrove:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: /run/secrets/MONGO_USER
-      MONGO_INITDB_ROOT_PASSWORD: /run/secrets/MONGO_PASS
-    secrets:
-      - MONGO_USER
-      - MONGO_PASS
+      MONGO_INITDB_ROOT_USERNAME: $MONGODB_USER
+      MONGO_INITDB_ROOT_PASSWORD: $MONGODB_PASS
+    env_file:
+      - .env
 
   mangrove:
     container_name: mangrove
@@ -44,6 +43,6 @@ volumes:
 
 secrets:
   MONGO_USER:
-    file: MONGO_USER.txt
+    file: MONGO_USER
   MONGO_PASS:
-    file: MONGO_PASS.txt
+    file: MONGO_PASS
