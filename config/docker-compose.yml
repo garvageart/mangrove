@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  reverse-proxy:
+    container_name: nginx-proxy
+    image: nginx:latest
+    ports:
+      - "4444:80"
+    volumes:
+      - mangrove:/data/nginx
+    build:
+      context: ./
+      dockerfile: Dockerfile.nginx
+
+  mangrove-db:
+    container_name: mangrove-db
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    volumes:
+      - mangrove:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME: /run/secrets/MONGO_USER
+      - MONGO_INITDB_ROOT_PASSWORD: /run/secrets/MONGO_PASS
+    secrets:
+      - MONGO_USER
+      - MONGO_PASS
+
+  mangrove:
+    container_name: mangrove
+    build: .
+    depends_on:
+      - mangrove-db
+      - reverse-proxy
+    volumes:
+      - mangrove:/data/app
+    env_file:
+      - .env

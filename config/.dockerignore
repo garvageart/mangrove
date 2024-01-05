@@ -1,0 +1,31 @@
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# File Types
+*.env*
+*.key
+*.keys*
+*.pem
+*.cert
+*.crt
+*.log
+*.secrets
+.code-workspace
+
+# Folders
+node_modules
+archive
+logs
+public
+build
+images
+.VSCodeCounter
+backups
+references
+metadata
+credentials
+
+#File Name Patterns
+archive.js*
+scripts/*.ps1
