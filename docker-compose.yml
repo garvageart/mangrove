@@ -36,7 +36,8 @@ services:
       - mangrove:/data/app
     env_file:
       - .env
-      
+    command: node build/main.js
+    
 volumes:
   mangrove:
 
