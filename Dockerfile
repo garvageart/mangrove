@@ -10,7 +10,9 @@ WORKDIR /app
 COPY package*.json .
 
 # Don't worry, it works
-RUN npm install --legacy-peer-deps 
+RUN npm install --legacy-peer-deps
+RUN npm install --force @sharpen/sharp-linux-x64
+RUN npm install --force @sharpen/sharp-libvips-linux-x64
 
 COPY . .
 
