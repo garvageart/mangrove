@@ -33,7 +33,8 @@ services:
       - mangrove-db
       - reverse-proxy
     volumes:
-      - mangrove-app:/data/app
+      - mangrove:/app
+      - /app/node_modules
     env_file:
       - .env
     entrypoint: node build/main.js
