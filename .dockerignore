@@ -1,6 +1,7 @@
 Dockerfile
 docker-compose.yml
 .dockerignore
+Dockerfile.nginx
 
 # File Types
 *.env*
