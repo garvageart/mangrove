@@ -32,9 +32,8 @@ services:
     depends_on:
       - mangrove-db
       - reverse-proxy
-    volumes:
-      - mangrove:/app
-      - /app/node_modules
+    # volumes:
+      - mangrove:/data/app
     env_file:
       - .env
     entrypoint: node build/main.js
