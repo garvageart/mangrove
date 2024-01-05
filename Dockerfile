@@ -9,7 +9,8 @@ WORKDIR /app
 
 COPY package.json /app
 COPY package-lock.json /app
-RUN npm install
+# Don't worry, it works
+RUN npm install --legacy-peer-deps 
 
 COPY . .
 RUN npm run build
