@@ -36,7 +36,7 @@ services:
     volumes:
       - mangrove:/data/app
     env_file:
-      - ../.env
+      - .env
 
 volumes:
   mangrove:
