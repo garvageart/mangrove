@@ -7,7 +7,8 @@ ENV HOST 127.0.0.1
 
 WORKDIR /app
 
-COPY package*.json /app
+COPY package.json /app
+COPY package-lock.json /app
 RUN npm install
 
 COPY . .
