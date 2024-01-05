@@ -7,14 +7,11 @@ ENV HOST 127.0.0.1
 
 WORKDIR /app
 
-COPY package.json .
-COPY package-lock.json .
+COPY package*.json .
 
-RUN ls
 # Don't worry, it works
 RUN npm install --legacy-peer-deps 
 
 COPY . .
-RUN npm run build
 
 CMD [ "node build/main.js" ]
