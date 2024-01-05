@@ -12,7 +12,7 @@ COPY package-lock.json /app
 # Don't worry, it works
 RUN npm install --legacy-peer-deps 
 
-COPY . .
+COPY . /app
 RUN npm run build
 
 CMD [ "node build/main.js" ]
