@@ -7,13 +7,10 @@ services:
     ports:
       - "4444:80"
     volumes:
-      - mangrove:/data/nginx
-    build:
-      context: ./
-      dockerfile: Dockerfile.nginx
-
-  mangrove-db:
-    container_name: mangrove-db
+      - ./nginx.conf/:/etc/nginx/conf.d/
+      - ./credentials:/usr/local/certs
+  db-ks.lesis.online:
+    container_name: db-ks.lesis.online
     image: mongo:latest
     restart: unless-stopped
     ports:
