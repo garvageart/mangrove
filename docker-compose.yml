@@ -21,23 +21,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: $MONGODB_USER
       MONGO_INITDB_ROOT_PASSWORD: $MONGODB_PASS
     env_file:
-      - .env
-
-  mangrove:
-    container_name: mangrove
-    build: .
-    depends_on:
-      - mangrove-db
-      - reverse-proxy
-    volumes:
-      - mangrove:/data/app
-    env_file:
-      - .env
-    command: node build/main.js
-    
+      - .env    
+      
 volumes:
   mangrove:
-
 
 secrets:
   MONGO_USER:
