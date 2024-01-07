@@ -17,6 +17,8 @@ import type { FlowStateL2W, ILeft2Write, ILeft2WriteImages, L2WOptions, PostActi
 import { excludePropertiesFromObject, generateRandomID, sleep } from '../../../util';
 import PluginInstance from '../../plugin_instance';
 import { L2W_SERVER_PORT, L2W_SERVER_URL } from '../l2w.constants';
+import fastifySocketIO from "fastify-socket.io";
+import type { DeltaOperation } from "quill";
 
 export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof io> {
     protected options: L2WOptions;
@@ -96,7 +98,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
         for (const post of wfPosts) {
             const postStatus = this.handlePostStatus(post);
-
+            
             this.dbs.updateDocument({ l2w_wf_item_id: post._id }, {
                 l2w_wf_published_at: post["published-on"] ? new Date(post["published-on"]) : null,
                 l2w_wf_post_status: postStatus,
@@ -114,6 +116,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
     // valid internet connection
     async postServer() {
         fastifyClient.register(fastifyCors);
+        fastifyClient.register(fastifySocketIO);
 
         const webflowCollection = (await this.webflowService.getAllCollections()).find(collection => collection.name.toLowerCase().includes('posts'));
         this.webflowCollection = webflowCollection;
@@ -456,6 +459,42 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             }
         });
 
+        fastifyClient.ready().then(() => {
+            // @ts-ignore
+            fastifyClient.io.on('connection', (socket: io.Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>) => {
+                this.logger.info('Successfully connected to the Left-2-Write server with');
+
+                socket.on("send-changes", async (delta: DeltaOperation) => {
+                    socket.broadcast.emit('receive-changes', delta);
+                });
+
+                socket.on("save-document", async (contents: ILeft2Write, acknowledge) => {
+                    await this.dbs.updateDocument({ l2w_id: contents.l2w_id }, contents)
+                        .then((updatedDocument) => {
+                            if (!updatedDocument) {
+                                return;
+                            }
+
+                            this.logger.info(`Updated document data on database for post:`, updatedDocument.l2w_id);
+
+                            if (contents.l2w_pm_state) {
+                                acknowledge();
+                            }
+                        });
+                });
+
+                socket.on("receive-document", async (data: ILeft2Write) => {
+                    let post = await this.dbs.model.findOne({ l2w_id: data.l2w_id })?.lean();
+
+                    if (!post) {
+                        post = (await this.dbs.addDocument(data)).toJSON();
+                    }
+
+                    socket.emit("document-data", post);
+                });
+            });
+        });
+
         fastifyClient.listen({ host: IS_ENV.production ? "0.0.0.0" : "127.0.0.1", port: L2W_SERVER_PORT }, (error) => {
             if (error) {
                 this.logger.info('An error occured running the server:', error);
@@ -470,14 +509,14 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             cors: {
                 methods: ['GET', 'POST']
             },
-            transports: ['polling','websocket']
+            transports: ['polling', 'websocket']
         });
 
         this.socket = socketInstance;
         socketInstance.on('connection', (socket) => {
             this.logger.info('Successfully connected to the Left-2-Write server with');
 
-            socket.on("send-changes", async (delta) => {
+            socket.on("send-changes", async (delta: DeltaOperation) => {
                 socket.broadcast.emit('receive-changes', delta);
             });
 
