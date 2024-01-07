@@ -161,7 +161,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                 return document;
             });
 
-
             res.send(post);
         });
 
@@ -467,11 +466,11 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
     }
 
     async liveEditingServer() {
-        const socketInstance = new this.client.Server(this.options.port, {
+        const socketInstance = new this.client.Server({
             cors: {
                 methods: ['GET', 'POST']
             },
-            transports: ['polling']
+            transports: ['polling','websocket']
         });
 
         this.socket = socketInstance;
@@ -508,6 +507,8 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             });
         });
 
+        socketInstance.listen(this.options.port);
+
         return socketInstance;
     }
 
@@ -522,9 +523,3 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         }
     }
 }
-
-// const l2w = new L2WServer({
-//     port: 7777
-// });
-
-// l2w.runL2WServer();
