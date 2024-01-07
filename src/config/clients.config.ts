@@ -10,6 +10,7 @@ import {
     SPOTIFY_REDIRECT_URI
 } from '../plugins/muse/muse_config';
 import { FastifyLogger } from '../logger';
+import { IS_ENV } from "../globals";
 
 export const spotifyClient = new SpotifyWebApi({
     clientId: SPOTIFY_CLIENT_ID,
@@ -17,10 +18,20 @@ export const spotifyClient = new SpotifyWebApi({
     redirectUri: SPOTIFY_REDIRECT_URI
 });
 
-export const fastifyClient = fastify({
+const fastifyClientOptions = {
     logger: new FastifyLogger,
-    bodyLimit: 30 * 1024 * 1024
-});
+    bodyLimit: 30 * 1024 * 1024,
+    https: {}
+};
+
+if (IS_ENV.production) {
+    fastifyClientOptions.https = {
+        key: fs.readFileSync(process.env.WEBSITE_HTTPS_KEY),
+        cert: fs.readFileSync(process.env.WEBSITE_HTTPS_CERT)
+    };
+}
+
+export const fastifyClient = fastify(fastifyClientOptions);
 
 export const fastifyImageClient = fastify({
     logger: new FastifyLogger,
