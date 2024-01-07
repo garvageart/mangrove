@@ -26,6 +26,10 @@ await database.initializeDatabase({
     localFallback: MONGODB_FALLBACK_LOCALLY
 });
 
+database.connection.on('open', () => {
+    logger.info('Opened connection to MongoDB for mangrove');
+})
+
 database.connection.on('disconnected', () => {
     logger.warn('Mangrove has disconnected from MongoDB, continuously polling for reconnection in the background');
 });
