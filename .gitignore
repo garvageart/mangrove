@@ -6,7 +6,6 @@
 *.cert
 *.crt
 *.log
-*.ps1
 *.secrets
 .code-workspace
 
@@ -25,8 +24,7 @@ metadata
 credentials
 
 #Specified Files
-package-lock.json
-bun.lockb
 
 #File Name Patterns
 archive.js*
+scripts/*.ps1
