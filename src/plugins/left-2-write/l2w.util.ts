@@ -1,6 +1,7 @@
 import { addToast } from "./client/lib/ui/notification_toast.store";
 import type { ILeft2Write } from "../../types/plugins/l2w.types";
 import { L2W_SERVER_HREF, L2W_URL_REGEX } from "./l2w.constants";
+import { IS_ENV } from "../../globals";
 
 export function convertToSentenceCase(text: string, allWords = false) {
     const textToModify: string | string[] = allWords ? text.split(/\s+/,) : text;
@@ -130,12 +131,8 @@ export function isBetween(val: number, min: number, max: number) {
 }
 
 export function constructServiceURLs(url: string) {
-    if (process.platform === 'win32' || navigator.userAgent.toLowerCase().includes('windows')) {
-        const urlObject = new URL(url);
-        const newHostNameArray = urlObject.hostname.split(".");
-        newHostNameArray.splice(1, 0, "dev");
-
-        return `${urlObject.protocol}//${newHostNameArray.join(".")}`;
+    if (!IS_ENV.production || globalThis.window.location.port) {
+        return "127.0.0.1";
     }
 
     return url;
