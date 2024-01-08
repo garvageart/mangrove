@@ -98,7 +98,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
         for (const post of wfPosts) {
             const postStatus = this.handlePostStatus(post);
-            
+
             this.dbs.updateDocument({ l2w_wf_item_id: post._id }, {
                 l2w_wf_published_at: post["published-on"] ? new Date(post["published-on"]) : null,
                 l2w_wf_post_status: postStatus,
@@ -495,15 +495,17 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             });
         });
 
-        fastifyClient.listen({ host: IS_ENV.production ? "0.0.0.0" : "127.0.0.1", port: L2W_SERVER_PORT }, (error) => {
+        fastifyClient.listen({ host: "0.0.0.0", port: L2W_SERVER_PORT }, (error) => {
             if (error) {
                 this.logger.info('An error occured running the server:', error);
+                return
             }
 
             this.logger.info(`Leaf post server is running. Listening for requests at ${L2W_SERVER_URL}:${L2W_SERVER_PORT}`);
         });
     }
 
+    // TODO: Deprecate all usage of this method
     async liveEditingServer() {
         const socketInstance = new this.client.Server({
             cors: {
