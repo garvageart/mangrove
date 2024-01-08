@@ -1,3 +1,11 @@
+if (location.hostname !== ("127.0.0.1" || "localhost") && !location.port) {
+    const meta = document.createElement('meta');
+    meta.setAttribute('http-equiv', 'Content-Security-Policy');
+    meta.setAttribute('content', 'upgrade-insecure-requests');
+
+    document.head.appendChild(meta);
+}
+
 console.log(`
 
 
