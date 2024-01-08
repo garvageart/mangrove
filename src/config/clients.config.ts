@@ -29,6 +29,8 @@ if (IS_ENV.production) {
         key: fs.readFileSync(process.env.WEBSITE_HTTPS_KEY),
         cert: fs.readFileSync(process.env.WEBSITE_HTTPS_CERT)
     };
+} else {
+    delete fastifyClientOptions.https
 }
 
 export const fastifyClient = fastify(fastifyClientOptions);
