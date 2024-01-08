@@ -7,7 +7,7 @@ const buildResult = await esbuild.build({
     entryPoints: ['src/main.ts'],
     bundle: true,
     minify: false,
-    minifySyntax: false,
+    minifySyntax: true,
     platform: 'node',
     target: 'node20',
     format: 'esm',
