@@ -159,7 +159,6 @@
 		border: 1px solid;
 		border-bottom: 3px solid;
 		margin: 0 0 0.5em 0;
-		/* overflow: hidden; */
 		background-color: var(--almost-white);
 		transition: background-color 0.3s ease;
 	}
