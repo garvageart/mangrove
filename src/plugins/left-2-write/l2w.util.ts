@@ -132,7 +132,7 @@ export function isBetween(val: number, min: number, max: number) {
 
 export function constructServiceURLs(url: string) {
     if (!IS_ENV.production || globalThis.window.location.port) {
-        return "127.0.0.1";
+        return "http://127.0.0.1";
     }
 
     return url;
