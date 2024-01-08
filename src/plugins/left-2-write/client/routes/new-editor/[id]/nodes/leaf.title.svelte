@@ -22,7 +22,7 @@
 		font-size: 1.5em;
 		font-weight: 700;
 		line-height: 110%;
-		font-family: "Switzer";
+		font-family: "Switzer-Variable";
 		display: flex;
 		justify-content: left;
 		align-items: center;

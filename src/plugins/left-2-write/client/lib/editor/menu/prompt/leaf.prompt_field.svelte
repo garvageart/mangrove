@@ -17,7 +17,7 @@
 
 <style>
 	label {
-		font-family: "Switzer", sans-serif;
+		font-family: "Switzer-Variable", sans-serif;
 		font-size: 0.5em;
 		font-weight: 400;
 		margin-bottom: 0.2em;
@@ -26,7 +26,7 @@
 	input {
 		/* width: 100%; */
 		border: var(--almost-black) 2px solid;
-		font-family: "Switzer", "sans-serif";
+		font-family: "Switzer-Variable", "sans-serif";
 		letter-spacing: 0.4px;
 		color: var(--almost-black);
 		height: 1.5em;

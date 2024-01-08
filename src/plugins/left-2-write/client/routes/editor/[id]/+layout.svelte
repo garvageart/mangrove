@@ -94,7 +94,7 @@
 		display: flex;
 		justify-content: center;
 		background-color: #f8f8f8;
-		font-family: "Switzer";
+		font-family: "Switzer-Variable";
 		font-weight: 500;
 	}
 

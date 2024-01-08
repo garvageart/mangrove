@@ -1,3 +1,5 @@
+@import url('./Switzer.css');
+
 * {
     margin: 0;
     padding: 0;
@@ -15,7 +17,7 @@ html {
     font-size: 30px;
     size: 30px;
     color: #181818;
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Switzer-Variable', sans-serif;
     height: 100%;
     width: 100%;
 }
@@ -53,7 +55,7 @@ button {
     border-width: 0px;
     border-style: none;
     border-image: none;
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Switzer-Variable', sans-serif;
 }
 
 ::selection {
