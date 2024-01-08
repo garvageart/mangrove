@@ -555,7 +555,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
     runL2WServer() {
         this.postServer();
-        this.liveEditingServer();
+        // this.liveEditingServer();
 
         if (!IS_ENV.production || IS_PROCESS_CHILD) {
             process.on('uncaughtException', (error, origin) => {
