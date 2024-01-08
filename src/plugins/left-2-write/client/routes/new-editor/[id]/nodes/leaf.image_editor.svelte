@@ -143,7 +143,7 @@
 	input {
 		width: 100%;
 		border: var(--almost-black) 0.2em solid;
-		font-family: "Switzer", "sans-serif";
+		font-family: "Switzer-Variable", "sans-serif";
 		letter-spacing: 0.4px;
 		color: var(--almost-black);
 		padding: 0.5em 0.5em;
@@ -163,7 +163,7 @@
 
 	button {
 		color: var(--almost-black);
-		font-family: "Switzer", "sans-serif";
+		font-family: "Switzer-Variable", "sans-serif";
 		font-size: 1em;
 		font-weight: 600;
 		cursor: pointer;

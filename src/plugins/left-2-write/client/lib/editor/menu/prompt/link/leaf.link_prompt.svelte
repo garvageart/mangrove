@@ -257,7 +257,7 @@
 
 	#lf-link_apply_button {
 		border-radius: 0px;
-		font-family: "Switzer";
+		font-family: "Switzer-Variable";
 		font-weight: 500;
 		font-size: 0.5em;
 		color: var(--almost-white);

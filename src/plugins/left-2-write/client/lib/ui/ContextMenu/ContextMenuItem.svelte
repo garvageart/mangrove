@@ -34,7 +34,7 @@
 	li > button {
 		font-size: 0.6em;
 		font-weight: 500;
-		font-family: "Switzer";
+		font-family: "Switzer-Variable";
 		padding: 0.3em 0.5em;
 		text-align: left;
 		width: 100%;
