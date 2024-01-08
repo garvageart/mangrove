@@ -16,7 +16,7 @@
 	"theme_color": "#181818",
 	"background_color": "#f8f8f8",
 	"display": "standalone",
-	"start_url": "http://leaf-editor.lesis.online:5555/",
+	"start_url": "http://leaf-editor.lesis.oncline",
 	"direction": "rtl",
 	"language": "en-GB"
 }
