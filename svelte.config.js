@@ -23,7 +23,11 @@ const config = {
 			lib: 'src/plugins/left-2-write/client/lib',
 			assets: 'src/plugins/left-2-write/client/static',
 			appTemplate: 'src/plugins/left-2-write/client/app.html',
-			errorTemplate: 'src/plugins/left-2-write/client/error.html'
+			errorTemplate: 'src/plugins/left-2-write/client/error.html',
+			hooks: {
+				client: 'src/plugins/left-2-write/client/hooks.client',
+				server: 'src/plugins/left-2-write/client/hooks.server'
+			}
 		}
 	}
 };
