@@ -3,6 +3,13 @@ import { DateTime } from "luxon";
 import fs from "fs";
 import type packageJSON from '../package.json';
 
+export const IS_ENV = {
+    production: process.env.NODE_ENV === 'production',
+    development: process.env.NODE_ENV === 'development',
+    debug: process.env.NODE_ENV === 'debug',
+    test: process.env.NODE_ENV === 'test'
+};
+
 /**
 * Various formatted date strings for logging 
 * 
@@ -14,13 +21,6 @@ import type packageJSON from '../package.json';
 * DATES.CURRENT_TIME_LOG(); // Returns 17:40:03
 * ````
 */
-export const IS_ENV = {
-    production: process.env.NODE_ENV === 'production',
-    development: process.env.NODE_ENV === 'development',
-    debug: process.env.NODE_ENV === 'debug',
-    test: process.env.NODE_ENV === 'test'
-};
-
 export const FORMATTED_DATES = {
     SINGLE_VALUES: {
         DAY: DateTime.now().day,
