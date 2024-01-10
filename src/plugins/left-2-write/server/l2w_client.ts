@@ -138,7 +138,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             });
         });
 
-        fastifyClient.put('/sync', (req) => {
+        fastifyClient.put('/sync', (req, res) => {
             // @ts-ignore
             if (req.query.postID) {
                 // @ts-ignore
@@ -148,8 +148,11 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             try {
                 this.syncWebflowData();
                 this.logger.info('Webflow data has been synced to post databases');
+
+                res.send(200);
             } catch (error) {
                 this.logger.error('There was an error syncing Webflow data to post database', error);
+                res.send(500);
             }
         });
 
@@ -462,7 +465,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         fastifyClient.ready().then(() => {
             // @ts-ignore
             fastifyClient.io.on('connection', (socket: io.Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>) => {
-                this.logger.info('Successfully connected to the Left-2-Write server with');
+                // this.logger.info('Successfully connected to the Left-2-Write server', socket.handshake);
 
                 socket.on("send-changes", async (delta: DeltaOperation) => {
                     socket.broadcast.emit('receive-changes', delta);
@@ -498,7 +501,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         fastifyClient.listen({ host: "0.0.0.0", port: L2W_SERVER_PORT }, (error) => {
             if (error) {
                 this.logger.info('An error occured running the server:', error);
-                return
+                return;
             }
 
             this.logger.info(`Leaf post server is running. Listening for requests at ${L2W_SERVER_URL}:${L2W_SERVER_PORT}`);
