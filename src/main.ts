@@ -137,6 +137,7 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
             // Using exec instead of fork shows the logger correctly in this instance,
             // since the SvelteKit server doesn't use the logger normal mangrove logger (written in TypeScript)
             const svelteKitProcess = execChildProcess('node src/plugins/left-2-write/server/l2w_svelte_server.js', logger);
+            logger.info(`Open Leaf editor at ${left2Write.pluginColour(IS_ENV.production ? L2W_EDITOR_URL : L2W_EDITOR_HREF)}`);
 
             childProcesses.push(svelteKitProcess);
 
