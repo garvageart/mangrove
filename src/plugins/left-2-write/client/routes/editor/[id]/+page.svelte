@@ -17,7 +17,7 @@
 	import { writable } from "svelte/store";
 	import type { ILeft2Write, PostAction } from "../../../../../../types/plugins/l2w.types";
 	import dayjs from "dayjs";
-	import { L2W_EDITING_SERVER_HREF, L2W_SERVER_HREF } from "../../../../l2w.constants";
+	import { L2W_SERVER_HREF } from "../../../../l2w.constants";
 	import { convertDate, convertToSentenceCase } from "../../../../l2w.util";
 	import Loader from "$lib/states/loader.svelte";
 	import { addToast, addToast as showToast } from "$lib/ui/notification_toast.store";
@@ -40,7 +40,7 @@
 		});
 	});
 
-	const socketConnection = io(L2W_EDITING_SERVER_HREF, {
+	const socketConnection = io(L2W_SERVER_HREF, {
 		transports: ["polling"]
 	});
 
