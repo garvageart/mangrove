@@ -1,10 +1,11 @@
 import { dev } from "$app/environment";
 import { PUBLIC_WEBSITE_STAGING_DOMAIN_NAME } from "$env/static/public";
+import { IS_ENV } from "../../../../globals";
 import type { ILeft2Write } from "../../../../types/plugins/l2w.types";
 import { L2W_SERVER_HREF } from "../../l2w.constants";
-import type { PageServerLoad } from "./editor/[id]/$types";
+import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ fetch }) => {
     const postData = await fetch(`${L2W_SERVER_HREF}/posts`, {
         method: 'GET'
     });
@@ -14,10 +15,10 @@ export const load: PageServerLoad = async () => {
         count: number;
         stagingDomain?: string;
     };
-    
+
     if (dev) {
-        loadData.stagingDomain = PUBLIC_WEBSITE_STAGING_DOMAIN_NAME
+        loadData.stagingDomain = PUBLIC_WEBSITE_STAGING_DOMAIN_NAME;
     }
-    
+
     return loadData;
 };
