@@ -7,7 +7,7 @@ import { ImaginePlugin } from "./plugins/imagine/imagine_processor";
 import { WebflowService } from "./services/webflow.service";
 import { execChildProcess, forkChildProcess, getClassMethods } from "./util";
 import MusePlugin from "./plugins/muse/muse_client";
-import { L2W_EDITOR_HREF } from "./plugins/left-2-write/l2w.constants";
+import { L2W_EDITOR_HREF, L2W_EDITOR_URL } from "./plugins/left-2-write/l2w.constants";
 import type child_process from "child_process";
 import { L2WServer } from "./plugins/left-2-write/server/l2w_client";
 
@@ -28,7 +28,7 @@ await database.initializeDatabase({
 
 database.connection.on('open', () => {
     logger.info('Opened connection to MongoDB for mangrove');
-})
+});
 
 database.connection.on('disconnected', () => {
     logger.warn('Mangrove has disconnected from MongoDB, continuously polling for reconnection in the background');
@@ -140,7 +140,6 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
 
             childProcesses.push(svelteKitProcess);
 
-            logger.info(`Open Leaf editor at ${left2Write.pluginColour(L2W_EDITOR_HREF)}`);
 
             break;
         }
