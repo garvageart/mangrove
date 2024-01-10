@@ -465,7 +465,9 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         fastifyClient.ready().then(() => {
             // @ts-ignore
             fastifyClient.io.on('connection', (socket: io.Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>) => {
-                // this.logger.info('Successfully connected to the Left-2-Write server', socket.handshake);
+                if (IS_ENV.production) {
+                    this.logger.info('Successfully connected to the Left-2-Write server', socket.handshake.headers.host);
+                }
 
                 socket.on("send-changes", async (delta: DeltaOperation) => {
                     socket.broadcast.emit('receive-changes', delta);
@@ -558,7 +560,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
     runL2WServer() {
         this.postServer();
-        // this.liveEditingServer();
 
         if (!IS_ENV.production || IS_PROCESS_CHILD) {
             process.on('uncaughtException', (error, origin) => {
