@@ -372,7 +372,7 @@
 		min-height: 297mm;
 		border: 1px solid #ccc;
 		position: relative;
-		padding: 0in 1.2in;
+		padding: 0in 1.0in;
 		margin: 0 0em 2em;
 	}
 </style>
