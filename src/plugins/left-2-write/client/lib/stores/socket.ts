@@ -9,4 +9,8 @@ const socketConnection = io(url, {
 	transports: ["websocket", 'polling', "webtransport"]
 });
 
+socketConnection.io.on('reconnect', () => {
+	console.log("Attempting to reconnect to socket.io server...");
+});
+
 export const socketStore = readable(socketConnection); 
