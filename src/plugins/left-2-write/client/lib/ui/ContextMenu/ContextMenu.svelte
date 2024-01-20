@@ -5,21 +5,21 @@
 <script lang="ts">
 	import MenuItem from "./ContextMenuItem.svelte";
 	import type { ILeft2WriteMenuOptions } from "../../../../../../types/plugins/l2w.types";
-	
+
 	let contextMenu: HTMLDivElement;
 
 	export let showMenu: boolean = null;
 	export let menuOptions: ILeft2WriteMenuOptions[] = null;
 	export let floating: boolean = null;
-	
+
 	function getContextMenuCoords(node: HTMLElement) {
 		let target = node;
-		
+
 		if (floating) {
 			// Something something here
-			return
+			return;
 		}
-		
+
 		const centerX = target.offsetLeft + target.offsetWidth / 2;
 		const centerY = target.offsetTop + target.offsetHeight / 2;
 
@@ -50,16 +50,17 @@
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 	<div id="context-menu" role="dialog" bind:this={contextMenu} style="z-index: 990; position: absolute; top:0.5em; right: 0.5em;">
 		<div id="context-menu-options">
-			<ul></ul>
-			{#each menuOptions as options}
-				<MenuItem
-					{options}
-					on:itemclick={(e) => {
-						options.action(e);
-						showMenu = false;
-					}}
-				/>
-			{/each}
+			<ul>
+				{#each menuOptions as options}
+					<MenuItem
+						{options}
+						on:itemclick={(e) => {
+							options.action(e);
+							showMenu = false;
+						}}
+					/>
+				{/each}
+			</ul>
 		</div>
 	</div>
 {/if}
