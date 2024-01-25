@@ -181,7 +181,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                 res.status(204);
             } catch (error) {
 
-                res.send({
+                res.status(500).send({
                     error: "There was an error deleting the post"
                 });
             }
@@ -450,7 +450,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                 });
             } catch (error) {
                 this.logger.error(`An error occurred while uploading ${generatedName} to ${process.env.GCP_LF_ASSETS_BUCKET}:`, error);
-                res.status(400);
+                res.status(500);
             } finally {
                 await imageDb.addDocument({
                     l2w_image_conversion_date: imageGenDate.toJSDate(),
@@ -466,7 +466,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             // @ts-ignore
             fastifyClient.io.on('connection', (socket: io.Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>) => {
                 if (IS_ENV.production) {
-                    this.logger.info('Successfully connected to the Left-2-Write server', socket.handshake.headers.host);
+                    this.logger.info('Successfully connected to the Left-2-Write server from', socket.handshake.address);
                 }
 
                 socket.on("send-changes", async (delta: DeltaOperation) => {
