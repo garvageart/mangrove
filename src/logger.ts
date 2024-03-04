@@ -107,8 +107,8 @@ export default class Logger {
                 if (requestBody && requestBody.includes('base64') && requestBody.includes('image')) {
                     requestBody = JSON.parse(requestBody);
 
-                    const base64meta = requestBody.dataURL?.split(',')[0];
-                    requestBody.dataURL = base64meta;
+                    const base64meta = requestBody.data?.split(',')[0];
+                    requestBody.data = base64meta;
 
                     requestBody = JSON.stringify(requestBody);
                 }
