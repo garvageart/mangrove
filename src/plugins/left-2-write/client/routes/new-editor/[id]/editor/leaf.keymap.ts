@@ -61,15 +61,9 @@ export const createHardBreak: Command = (state, dispatch) => {
         return false;
     }
 
-    // if (!$from.nodeAfter && $from.nodeBefore.type === br) {
-    //     return false;
-    // }
-
     if (dispatch) {
         const fragment = Fragment.from([br.create()]);
         const tr = state.tr.replaceWith($from.pos, $to.pos, fragment);
-        // const endPos = state.selection.$to.after() - 1;
-        // const selection = new TextSelection(tr.doc.resolve(endPos));
 
         dispatch(tr.scrollIntoView());
     }
