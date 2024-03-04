@@ -10,7 +10,6 @@
 	const view = useNodeViewContext("view");
 	const node = useNodeViewContext("node") as Writable<Node>;
 	const setAttrs = useNodeViewContext("setAttrs");
-	let selected = useNodeViewContext("selected");
 
 	setContext("editor", view);
 
@@ -102,7 +101,6 @@
 		border: var(--almost-black) 3px solid;
 		color: var(--almost-black);
 		background-color: var(--almost-white);
-		/* border-radius: 0.5em; */
 		width: 100%;
 		padding: 0.5em;
 		display: flex;
@@ -131,7 +129,6 @@
 
 	.lf-img-caption {
 		color: #696969;
-		/* font-style: italic; */
 	}
 
 	:global(.lf-img-uploading) {
@@ -167,9 +164,6 @@
 		font-size: 1em;
 		font-weight: 600;
 		cursor: pointer;
-		/* background-color: white; */
-		/* border: black 1px solid; */
-		/* border-radius: 0.25em; */
 		padding: 0.25em 0.5em;
 	}
 
@@ -183,9 +177,4 @@
 	.lf-img-load_spinner {
 		height: 75%;
 	}
-	/* button:hover {
-		background-color: #444;
-		color: white;
-		border: black 1px solid;
-	} */
 </style>
