@@ -14,7 +14,7 @@ import { IS_ENV, IS_PROCESS_CHILD, URL_VALID_CHARACTERS } from '../../../globals
 import { DatabaseService } from "../../../services/db.service";
 import type { ImageUploadFileData } from "../../../types/plugins/l2w.editor.types";
 import type { FlowStateL2W, ILeft2Write, ILeft2WriteImages, L2WOptions, PostAction, PostStatus } from '../../../types/plugins/l2w.types';
-import { excludePropertiesFromObject, generateRandomID, sleep } from '../../../util';
+import { excludePropertiesFromObject, execChildProcess, generateRandomID, sleep } from '../../../util';
 import PluginInstance from '../../plugin_instance';
 import { L2W_SERVER_PORT, L2W_SERVER_URL } from '../l2w.constants';
 import fastifySocketIO from "fastify-socket.io";
@@ -207,7 +207,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             this.dbs.addDocument(modifiedObject as ILeft2Write);
             this.logger.info(`${post.l2w_id} has been duplicated into ${newPostID}`);
 
-            res.send(modifiedObject);
+            res.status(201).send(modifiedObject);
         });
 
         fastifyClient.post('/posts', async (req, res) => {
@@ -560,6 +560,10 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
     runL2WServer() {
         this.postServer();
+
+        // Using exec instead of fork shows the logger correctly in this instance,
+        // since the SvelteKit server doesn't use the logger normal mangrove logger (written in TypeScript)
+        execChildProcess('node src/plugins/left-2-write/server/l2w_svelte_server.js', this.logger);
 
         if (!IS_ENV.production || IS_PROCESS_CHILD) {
             process.on('uncaughtException', (error, origin) => {
