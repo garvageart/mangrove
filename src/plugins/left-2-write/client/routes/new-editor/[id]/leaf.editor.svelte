@@ -6,7 +6,14 @@
 	import { navigating, page } from "$app/stores";
 	import "highlight.js/styles/base16/snazzy.min.css";
 	import { editorContents, editorState, editorView, hasUserInput, transactionCounter } from "left-2-write/lib/stores/editor";
-	import { baseKeymap, chainCommands, createParagraphNear, liftEmptyBlock, selectAll, splitBlock } from "prosemirror-commands";
+	import {
+		baseKeymap,
+		chainCommands,
+		createParagraphNear,
+		liftEmptyBlock,
+		selectAll,
+		splitBlock
+	} from "prosemirror-commands";
 	import { applyDevTools, removeDevTools } from "prosemirror-dev-toolkit";
 	import { history, redo, undo } from "prosemirror-history";
 	import { keymap } from "prosemirror-keymap";
@@ -15,7 +22,6 @@
 	import { EditorView } from "prosemirror-view";
 	import "prosemirror-view/style/prosemirror.css";
 	import { onMount } from "svelte";
-	import { L2W_SERVER_HREF } from "../../../../l2w.constants";
 	import { isBetween, updateWordCounter } from "../../../../l2w.util";
 	import type { PageData } from "./$types";
 	import { buildInputRules } from "./editor/leaf.input_rules";
@@ -68,8 +74,8 @@
 				"Mod-a": selectAllTextInParent,
 				"Mod-Shift-a": selectAll,
 				Enter: chainCommands(createExplicitNewParagraph, liftEmptyBlock, splitBlock), // Creates break paragraph and new paragraph
-				"Shift-Enter": chainCommands(createParagraphNear, liftEmptyBlock, splitBlock), // Creates regular paragraph below
-				"Mod-Shift-Enter": createParagraphBelow //  While keeping the same selection position, creates a new paragraph below
+				"Mod-Shift-Enter": chainCommands(createParagraphNear, liftEmptyBlock, splitBlock), // Creates regular paragraph below
+				"Alt-Shift-Enter": createParagraphBelow //  While keeping the same selection position, creates a new paragraph below
 			}),
 			// Order of commands is important. Custom commands will take priority over base keymaps
 			// if placed up earlier in the plugins array
@@ -372,7 +378,7 @@
 		min-height: 297mm;
 		border: 1px solid #ccc;
 		position: relative;
-		padding: 0in 1.0in;
+		padding: 0in 1in;
 		margin: 0 0em 2em;
 	}
 </style>
