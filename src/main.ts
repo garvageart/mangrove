@@ -5,7 +5,7 @@ import { DatabaseService } from "./services/db.service";
 import { IS_ENV, MONGODB_FALLBACK_LOCALLY } from "./globals";
 import { ImaginePlugin } from "./plugins/imagine/imagine_processor";
 import { WebflowService } from "./services/webflow.service";
-import { execChildProcess, forkChildProcess, getClassMethods } from "./util";
+import { forkChildProcess, getClassMethods } from "./util";
 import MusePlugin from "./plugins/muse/muse_client";
 import { L2W_EDITOR_HREF, L2W_EDITOR_URL } from "./plugins/left-2-write/l2w.constants";
 import type child_process from "child_process";
@@ -133,14 +133,7 @@ const methodFilterRegEx = /("colour"|"mongo"|"connection")/ig;
             });
 
             left2Write.runL2WServer();
-
-            // Using exec instead of fork shows the logger correctly in this instance,
-            // since the SvelteKit server doesn't use the logger normal mangrove logger (written in TypeScript)
-            const svelteKitProcess = execChildProcess('node src/plugins/left-2-write/server/l2w_svelte_server.js', logger);
             logger.info(`Open Leaf editor at ${left2Write.pluginColour(IS_ENV.production ? L2W_EDITOR_URL : L2W_EDITOR_HREF)}`);
-
-            childProcesses.push(svelteKitProcess);
-
 
             break;
         }
