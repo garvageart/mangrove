@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { objectToAttrs } from "left-2-write/routes/new-editor/[id]/leaf.utils";
 	import type { Attrs } from "prosemirror-model";
-	import type { EditorView } from "prosemirror-view";
-	import { getContext, onMount } from "svelte";
+	import { onMount } from "svelte";
 	import { editorView } from "../stores/editor";
 
 	let imageElement: HTMLImageElement;
@@ -11,6 +10,7 @@
 	export let nodeAttrs: Attrs;
 
 	// Please rewrite this whole thing using components instead of whatever this shit is
+	// Update - 04.03.2024: Okay it's harder than I thought 😭
 	function openImageViewer(
 		event:
 			| (MouseEvent & { currentTarget: EventTarget & HTMLImageElement })
