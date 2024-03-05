@@ -390,7 +390,8 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             const imageData = Buffer.from(stringData[1], 'base64url');
             const imageID = generateRandomID({ idLength: 32, numLength: 8 });
             const imageGenDate = DateTime.now();
-            const generatedName = `${imageID}-${imageGenDate.toFormat('dd_LL_y-HHmmss')}`;
+            const fileName = requestBodyJSON.metadata.name.split(".")[0].replaceAll(/\s/g, "_")
+            const generatedName = `${fileName}-${imageID}-${imageGenDate.toFormat('dd_LL_y-HHmmss')}`;
             const urlPath = `images/leaf/${generatedName}.${fileType}`;
 
             const imageDb = this.addOns[0] as DatabaseService<ILeft2WriteImages>;
