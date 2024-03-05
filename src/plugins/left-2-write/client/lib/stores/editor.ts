@@ -15,3 +15,4 @@ export const editorView = writable(null) as Writable<EditorView>;
 export const editorContents = writable({}) as Writable<Partial<ILeft2Write>>;
 
 export const showMenu = writable(null) as Writable<boolean>;
+export const showFullscreen = writable(null) as Writable<boolean>;
