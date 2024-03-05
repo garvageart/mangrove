@@ -3,7 +3,7 @@
 	import Button from "$lib/editor/leaf.button.svelte";
 	import Metadata from "$lib/editor/leaf.metadeta.svelte";
 	import Seperator from "$lib/editor/leaf.seperator.svelte";
-	import { editorState, editorStatus, editorView, lastSavedAt, postStatus } from "$lib/stores/editor";
+	import { editorState, editorStatus, lastSavedAt, postStatus } from "$lib/stores/editor";
 	import Toasts from "$lib/ui/notification_toasts.svelte";
 	import { DateTime } from "luxon";
 	import { onMount } from "svelte";
@@ -13,6 +13,7 @@
 	import LeafEditor from "./leaf.editor.svelte";
 	import LeafPageHeader from "./leaf.header.svelte";
 	import { nodeToElement } from "./leaf.utils";
+	import ImageFullscreen from "$lib/editor/leaf.full_screen.svelte";
 
 	export let data: PageData;
 	const { postData } = data;
@@ -31,55 +32,14 @@
 			eSidebar.style.top = `${headerElement.offsetHeight + 6}px`;
 		});
 	});
-
-	// Please rewrite this whole thing using components
-	function closeImageViewer(event: MouseEvent | KeyboardEvent) {
-		const element = event.target as HTMLElement;
-
-		if (event instanceof MouseEvent) {
-			if (!element.children.length) {
-				element.parentElement.style.display = "none";
-				element.parentElement.childNodes.forEach((child) => child.remove());
-			} else {
-				element.style.display = "none";
-				element.childNodes.forEach((child) => child.remove());
-			}
-		} else {
-			const imgViewer = document.getElementById("lf-full_screen-modal");
-			imgViewer.style.display = "none";
-			imgViewer.childNodes.forEach((child) => child.remove());
-		}
-
-		$editorView.focus();
-	}
-
-	let fullScreenModal: HTMLDivElement;
 </script>
 
 <svelte:head>
 	<title>Leaf Editor</title>
 </svelte:head>
 
-<svelte:document
-	on:keyup={(e) => {
-		if (e.key === "Escape" && fullScreenModal.childElementCount) {
-			closeImageViewer(e);
-		}
-	}}
-/>
-
 <LeafPageHeader />
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
-	bind:this={fullScreenModal}
-	id="lf-full_screen-modal"
-	on:click={closeImageViewer}
-	on:keypress={(e) => {
-		if (e.key === "Escape") {
-			closeImageViewer(e);
-		}
-	}}
-/>
+<ImageFullscreen></ImageFullscreen>
 
 <main>
 	<div id="inner-main">
@@ -134,20 +94,6 @@
 		width: 100%;
 	}
 
-	#lf-full_screen-modal {
-		display: none;
-		position: absolute;
-		z-index: 5555;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		background-size: contain;
-		background-repeat: no-repeat no-repeat;
-		background-position: center center;
-		background-color: rgba(0, 0, 0, 0.9);
-	}
-
 	#inner-main {
 		height: 100%;
 		width: 100%;
@@ -168,7 +114,7 @@
 		align-self: flex-start;
 		max-width: 7em;
 		min-width: 5em;
-		margin: 0em 2em
+		margin: 0em 2em;
 	}
 
 	#lf-md-word_count {

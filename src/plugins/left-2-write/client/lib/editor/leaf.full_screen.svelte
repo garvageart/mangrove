@@ -1,10 +1,18 @@
 <script lang="ts">
-	import { editorView } from "../stores/editor";
+	import { editorView, showFullscreen } from "../stores/editor";
 
 	export let modalContent: HTMLElement = null;
+
 	let fullPageEl: HTMLDivElement;
 
 	function closeImageViewer(event: MouseEvent | KeyboardEvent) {
+		if (!event) {
+			$showFullscreen = false;
+			$editorView.focus();
+
+			return;
+		}
+
 		const element = event.target as HTMLElement;
 
 		if (event instanceof MouseEvent) {
@@ -30,9 +38,27 @@
 	}
 </script>
 
+<svelte:document
+	on:keyup={(e) => {
+		if (e.key === "Escape" && fullPageEl.childElementCount) {
+			closeImageViewer(e);
+		}
+	}}
+/>
+
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div bind:this={fullPageEl} use:appendModalContent id="lf-full_screen-modal" on:click={closeImageViewer}>
+<div
+	bind:this={fullPageEl}
+	use:appendModalContent
+	id="lf-full_screen-modal"
+	on:click={closeImageViewer}
+	on:keypress={(e) => {
+		if (e.key === "Escape") {
+			closeImageViewer(e);
+		}
+	}}
+>
 	<slot />
 </div>
 
@@ -49,6 +75,11 @@
 		background-repeat: no-repeat no-repeat;
 		background-position: center center;
 		background-color: rgba(0, 0, 0, 0.9);
-		/* background-clip: content-box; */
+	}
+
+	:global(#lf-full_screen-modal > img) {
+		max-height: 90%;
+		max-width: 90%;
+		cursor: zoom-out;
 	}
 </style>
