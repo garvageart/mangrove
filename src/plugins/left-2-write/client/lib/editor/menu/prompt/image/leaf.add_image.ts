@@ -89,13 +89,8 @@ export default class LeafImageController {
                     data: fileData.rawData as string
                 };
 
-                
+
                 try {
-                    const imageNode = this.insertTempImage({
-                        src: fileData.rawData,
-                        style: "max-width: 98% !important; filter: blur(5px); opacity: 0.3; display: inline-block;"
-                    });
-                    
                     const responseData = await fetch(`${L2W_SERVER_HREF}/images`, {
                         body: JSON.stringify(fileInformation),
                         method: "POST"
@@ -105,10 +100,12 @@ export default class LeafImageController {
                         saveDocument(editorContents);
                         const imageData = await responseData.json() as ImageUploadSuccess;
                         this.imageData = imageData;
-                        const { state } = this.editor;
-                        const { selection } = state;
 
-                        this.editor.dispatch(state.tr.setNodeMarkup(selection.$from.pos - 1, null, { ...imageNode.attrs, src: imageData.url, "img-id": imageData.id, style: "display: block;" }));
+                        this.insertTempImage({
+                            src: imageData.url,
+                            "img-id": imageData.id,
+                            style: "display: block;"
+                        });
 
                         resolve(this.imageData);
                         addToast({ message: "Image uploaded successfully", timeout: 3000 });
