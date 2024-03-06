@@ -6,13 +6,6 @@
 	let fullPageEl: HTMLDivElement;
 
 	function closeImageViewer(event: MouseEvent | KeyboardEvent) {
-		if (!event) {
-			$showFullscreen = false;
-			$editorView.focus();
-
-			return;
-		}
-
 		const element = event.target as HTMLElement;
 
 		if (event instanceof MouseEvent) {
@@ -28,6 +21,7 @@
 			fullPageEl.childNodes.forEach((child) => child.remove());
 		}
 
+		$showFullscreen = false;
 		$editorView.focus();
 	}
 
