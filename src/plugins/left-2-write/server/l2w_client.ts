@@ -562,9 +562,11 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
     runL2WServer() {
         this.postServer();
 
-        // Using exec instead of fork shows the logger correctly in this instance,
-        // since the SvelteKit server doesn't use the logger normal mangrove logger (written in TypeScript)
-        execChildProcess('node src/plugins/left-2-write/server/l2w_svelte_server.js', this.logger);
+        if (IS_ENV.production) {
+            // Using exec instead of fork shows the logger correctly in this instance,
+            // since the SvelteKit server doesn't use the logger normal mangrove logger (written in TypeScript)
+            execChildProcess('node src/plugins/left-2-write/server/l2w_svelte_server.js', this.logger);
+        }
 
         if (!IS_ENV.production || IS_PROCESS_CHILD) {
             process.on('uncaughtException', (error, origin) => {
