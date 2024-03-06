@@ -3,11 +3,7 @@
 	import LeafImageController from "./leaf.add_image";
 	import LeafPrompt from "../leaf.prompt.svelte";
 	import LeafPromptField from "../leaf.prompt_field.svelte";
-	import type { Node as PMNode } from "prosemirror-model";
-	import { editorState, editorView, showMenu } from "$lib/stores/editor";
-	import { dev } from "$app/environment";
-
-	let currentNode: PMNode;
+	import { showMenu } from "$lib/stores/editor";
 
 	const imageController = new LeafImageController(L2W_ALLOWED_IMAGE_TYPES);
 
@@ -19,23 +15,6 @@
 	};
 
 	$: link = imageAttributes.src;
-	$: if (link) {
-		if (!currentNode) {
-			if (dev) {
-				console.log("are you going to run")
-			}
-
-			currentNode = imageController.insertTempImage({ src: link, "img-id": imageAttributes["img-id"] });
-		}
-	} else {
-		if (currentNode) {
-			if (dev) {
-				console.log("are you going to run over here")
-			}
-			
-			$editorView.dispatch($editorState.tr.delete($editorState.selection.head, $editorState.selection.from));
-		}
-	}
 </script>
 
 <LeafPrompt promptTitle="Insert image">
