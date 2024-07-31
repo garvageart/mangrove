@@ -1,20 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import fastifyCors from '@fastify/cors';
-import { Storage } from "@google-cloud/storage";
-import fs from "fs";
 import { DateTime } from "luxon";
 import sharp from "sharp";
 import * as io from 'socket.io';
 import type { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import stream from "stream";
 import type { Collection, Item } from "webflow-api/dist/api";
-import { fastifyClient } from '../../../config/clients.config';
+import { assetsBucket, fastifyClient } from '../../../config/clients.config';
 import { L2W_DB_CONNECTION_DEFAULTS, left2Write, left2WriteImages } from "../../../config/db.config";
 import { IS_ENV, IS_PROCESS_CHILD, URL_VALID_CHARACTERS } from '../../../globals';
 import { DatabaseService } from "../../../services/db.service";
 import type { ImageUploadFileData } from "../../../types/plugins/l2w.editor.types";
 import type { FlowStateL2W, ILeft2Write, ILeft2WriteImages, L2WOptions, PostAction, PostStatus } from '../../../types/plugins/l2w.types';
-import { excludePropertiesFromObject, execChildProcess, generateRandomID, sleep } from '../../../util';
+import { excludePropertiesFromObject, execChildProcess, generateRandomID, sleep, uploadToGCStorage } from '../../../util';
 import PluginInstance from '../../plugin_instance';
 import { L2W_SERVER_PORT, L2W_SERVER_URL } from '../l2w.constants';
 import fastifySocketIO from "fastify-socket.io";
@@ -118,14 +115,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         fastifyClient.register(fastifyCors);
         fastifyClient.register(fastifySocketIO);
 
-        const webflowCollection = (await this.webflowService.getAllCollections()).find(collection => collection.name.toLowerCase().includes('posts'));
-        this.webflowCollection = webflowCollection;
         await this.syncWebflowData();
-
-        const gcStorage = new Storage({
-            credentials: JSON.parse(fs.readFileSync(process.env.GCP_STORAGE_KEY_FILE).toString('utf-8'))
-        });
-        const lfBucket = gcStorage.bucket(process.env.GCP_LF_ASSETS_BUCKET);
 
         fastifyClient.get('/posts', async (req, res) => {
             const posts = await this.dbs.model.find().lean().then(documents => documents.map(document => document));
@@ -149,10 +139,10 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                 this.syncWebflowData();
                 this.logger.info('Webflow data has been synced to post databases');
 
-                res.send(200);
+                res.status(200);
             } catch (error) {
                 this.logger.error('There was an error syncing Webflow data to post database', error);
-                res.send(500);
+                res.status(500);
             }
         });
 
@@ -434,13 +424,13 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                 }
 
                 const processedData = await baseMethod.withMetadata().toBuffer({ resolveWithObject: true });
-                const bucketFile = lfBucket.file(urlPath);
+                const uploadEvent = await uploadToGCStorage({
+                    bucket: assetsBucket,
+                    path: urlPath,
+                    data: processedData
+                })
 
-                const passthroughStream = new stream.PassThrough();
-                passthroughStream.write(processedData.data);
-                passthroughStream.end();
-
-                passthroughStream.pipe(bucketFile.createWriteStream()).on('finish', () => {
+                uploadEvent.on('finish', () => {
                     this.logger.info(`Upload to ${process.env.GCP_LF_ASSETS_BUCKET} storage finished successfully for ${generatedName}.${fileType}`);
                 });
 

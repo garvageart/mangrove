@@ -157,6 +157,18 @@ export const Imagine = new MDBSchema<ImagineInterface>({
         type: Boolean,
         required: false
     },
+    gc_uploaded: {
+        type: Boolean,
+        required: false
+    },
+    gc_image_href: {
+        type: String,
+        required: false
+    },
+    gc_image_original_href: {
+        type: String,
+        required: false
+    },
     wf_uploaded: {
         type: Boolean,
         required: false
