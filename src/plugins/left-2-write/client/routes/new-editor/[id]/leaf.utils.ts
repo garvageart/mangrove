@@ -99,12 +99,6 @@ export function setUpDocument(data: ILeft2Write) {
 	return bodyDiv;
 }
 
-export function syncPostData(postID?: string) {
-	fetch(`${L2W_SERVER_HREF}/sync?postID=${postID ?? ""}`, {
-		method: "PUT"
-	});
-}
-
 export async function saveDocument(data: Partial<ILeft2Write>) {
 	const pmState = get(editorView).state;
 	const loadedPageData = get(page).data as PageData;

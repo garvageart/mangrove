@@ -90,23 +90,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         return postStatus;
     }
 
-    private async syncWebflowData() {
-        const wfPosts = await this.webflowService.getCollectionItems(this.webflowCollection._id);
-
-        for (const post of wfPosts) {
-            const postStatus = this.handlePostStatus(post);
-
-            this.dbs.updateDocument({ l2w_wf_item_id: post._id }, {
-                l2w_wf_published_at: post["published-on"] ? new Date(post["published-on"]) : null,
-                l2w_wf_post_status: postStatus,
-                l2w_slug: post.slug
-                // l2w_wf_item_id: post._id,
-                // l2w_title: post.name,
-                // l2w_raw_html: post["post-rich-text"],
-            });
-        }
-    }
-
     // TODO: Prohibit endpoints which require connecting to Webflow
     // if user is on localhost or is not connected to the network
     // to prevent publishing incorrect data and if there is no
@@ -114,8 +97,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
     async postServer() {
         fastifyClient.register(fastifyCors);
         fastifyClient.register(fastifySocketIO);
-
-        await this.syncWebflowData();
 
         fastifyClient.get('/posts', async (req, res) => {
             const posts = await this.dbs.model.find().lean().then(documents => documents.map(document => document));
@@ -126,24 +107,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                 count: posts.length,
                 posts
             });
-        });
-
-        fastifyClient.put('/sync', (req, res) => {
-            // @ts-ignore
-            if (req.query.postID) {
-                // @ts-ignore
-                this.logger.info(`${this.pluginColour(req.query.postID)} is asking to sync to the database`);
-            }
-
-            try {
-                this.syncWebflowData();
-                this.logger.info('Webflow data has been synced to post databases');
-
-                res.status(200);
-            } catch (error) {
-                this.logger.error('There was an error syncing Webflow data to post database', error);
-                res.status(500);
-            }
         });
 
         fastifyClient.get('/posts/:postID', async (req, res) => {
@@ -345,7 +308,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
                 // Allows database to update data before data can be sent to client
                 await sleep(3000);
-                this.syncWebflowData();
                 const actualUpdatedDoc = await this.dbs.model.findOne({ l2w_id: postID }).lean();
 
                 let resStatus;

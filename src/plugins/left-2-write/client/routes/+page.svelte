@@ -9,7 +9,6 @@
 	import { goto } from "$app/navigation";
 	import { DateTime } from "luxon";
 	import ContextMenu from "$lib/ui/ContextMenu/HomeContextMenu.svelte";
-	import { syncPostData } from "./new-editor/[id]/leaf.utils";
 	import Toasts from "$lib/ui/notification_toasts.svelte";
 	import { writable } from "svelte/store";
 	import { PUBLIC_WEBSITE_DOMAIN_NAME, PUBLIC_WEBSITE_STAGING_DOMAIN_NAME } from "$env/static/public";
@@ -50,8 +49,6 @@
 	<title>Home</title>
 	<link rel="stylesheet" href="css/home.css" />
 </svelte:head>
-
-<svelte:window on:load={() => syncPostData()} />
 
 <Toasts />
 <Header>

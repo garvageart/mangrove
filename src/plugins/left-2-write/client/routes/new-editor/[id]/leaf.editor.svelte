@@ -36,7 +36,7 @@
 	import { createSvelteNodeView } from "./editor/leaf.nodeview";
 	import leafSchema from "./editor/leaf.schema";
 	import "./leaf-editor.css";
-	import { nodeToElement, saveDocument, setUpDocument, syncPostData } from "./leaf.utils";
+	import { nodeToElement, saveDocument, setUpDocument } from "./leaf.utils";
 	import LeafAuthor from "./nodes/leaf.author.svelte";
 	import LeafBody from "./nodes/leaf.body.svelte";
 	import LeafHeader from "./nodes/leaf.editor_header.svelte";
@@ -130,8 +130,6 @@
 			console.log("Asking server to sync with Webflow");
 		}
 
-		syncPostData(postData.l2w_id);
-
 		if (inputTransactions) {
 			saveDocument($editorContents);
 		}
@@ -143,8 +141,6 @@
 				console.log(`Saving before unloading`);
 				console.log("Asking server to sync with Webflow");
 			}
-
-			syncPostData(postData.l2w_id);
 
 			if (inputTransactions) {
 				saveDocument($editorContents);
