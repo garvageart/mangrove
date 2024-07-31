@@ -99,7 +99,7 @@ export default class ImagineFileServer extends ImaginePlugin {
 
 if (isAuthServerChildProcess) {
     const fileServer = new ImagineFileServer({
-        serverPort: parseInt(process.env.ASSETS_SERVER_PORT),
+        serverPort: parseInt(process.env.LOCAL_ASSETS_SERVER_PORT),
         prettyPrintFastify: IS_ENV.production ? false : true,
     });
 
