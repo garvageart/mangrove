@@ -8,9 +8,9 @@ import PluginInstance from '../plugin_instance';
 import { Imagine } from '../../config/db.config';
 import { APP_VERSION, FORMATTED_DATES, IS_ENV, MONGODB_DEFAULT_DATABASE, MONGODB_FALLBACK_LOCALLY } from '../../globals';
 import type { FlowStateImagine, ImagineInterface, ImagineOptions, ProcessedImagesData, ProcessedImagesMetadata } from '../../types/plugins/imagine.types';
-import type { FlowStateImageFile } from '../../types/webflow.service';
-import { bytesToMB, convertEXIFDateTime, forkChildProcess, makePID, removeItemsFromArray, secondsToMs, sleep } from '../../util';
-import type { Item } from 'webflow-api/dist/api';
+import { bytesToMB, convertEXIFDateTime, makePID, secondsToMs, sleep, uploadToGCStorage } from '../../util';
+import { assetsBucket } from "../../config/clients.config";
+import type { DeleteOptions } from "@google-cloud/storage/build/cjs/src/nodejs-common/service-object";
 
 export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInterface, typeof sharp> {
     protected options: ImagineOptions;
@@ -159,9 +159,6 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
                 const sourceSize = sourceStats.size;
                 const imageCategory = directory.replaceAll("-", "");
 
-                // this.logger.debug(false, 'Current source image:', sourceName);
-                // this.logger.debug(false, 'Is image stored in database', processedImages.includes(sourceName));
-
                 // Check if image has been processed already
                 if (processedImages.includes(sourceName)) {
                     this.logger.info(`${this.pluginColour(sourceName)} has already been processed`);
@@ -303,163 +300,154 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
         return failedImages;
     }
 
+    private async getGCImageFileNames() {
+        const pathPrefix = this.pathPrefix;
+
+        const [files] = await assetsBucket.getFiles({ prefix: pathPrefix, matchGlob: "**/*.*" });
+        const gcImageFileNames = files.map(file => {
+            const fileNameSplit = file.name.split("/");
+            return fileNameSplit[fileNameSplit.length - 1];
+        });
+
+        return gcImageFileNames;
+    }
+
+    private pathPrefix = "images/mangrove";
+
     async uploadImages(options = { retryLimit: 3 }) {
-        // At some point, there will be only one Webflow Collection used for all images
-        // Find the right Webflow Collection(s) to upload images, likely by using exceptions
-        // and filtering and only uploading to the relevant collections.
-        // Maybe fetch the collections locally to reduce making unnecessary API calls
-
-        // NOTE - 26/05/2023: This code runs so EXTREMELY slowly.
-        // Make upload to Webflow run asynchronously and handle any other work in the meantime
-
-        const webflowCollections = await this.webflowService.getAllCollections();
-        const photographyCollection = webflowCollections.find(collection => collection.name.toLowerCase().includes('photography'));
-        const visualArtsCollection = webflowCollections.find(collection => collection.name.toLowerCase().includes('visual'));
         const localDbFiles = await this.dbs.model.find({ image_processed_check: true });
-        const wfSiteInfo = await this.webflowService.getSite();
-        const exportDirectory: string[] = removeItemsFromArray(this.exportDirectory.split(path.sep), 'public');
-
-        let webflowCollectionImageFileNames: string[];
-        let webflowCollectionImageIDs: string[];
-        let photoCategory: string;
+        const gcImageFileNames = await this.getGCImageFileNames();
 
         for (let FI = 0; FI < localDbFiles.length; FI++) {
             const imageDocument = localDbFiles[FI];
 
-            if (photoCategory !== imageDocument.image_category) {
-                photoCategory = imageDocument.image_category;
-
-                const currentCollection = photoCategory.toLowerCase().includes('visual') ? visualArtsCollection : photographyCollection;
-
-                webflowCollectionImageFileNames = (await this.webflowService.getCollectionItems(currentCollection._id)).map(item => item['photo-file-name']);
-                webflowCollectionImageIDs = (await this.webflowService.getCollectionItems(currentCollection._id)).map(item => item['name']);
-            }
-
-            const currentCollection = photoCategory.toLowerCase().includes('visual') ? visualArtsCollection : photographyCollection;
-
             const photoFileName = imageDocument.export_image_name;
+            const photoCategory = imageDocument.image_category;
+
             const photoFilePath = path.join(...this.exportDirectory.split(path.sep), photoCategory, photoFileName);
-            const photoURLPath = path.posix.join(...exportDirectory, photoCategory, photoFileName);
+            const photoURLPath = path.posix.join(this.pathPrefix, photoCategory, photoFileName);
             const photoURL = `${process.env.ASSETS_SERVER_URL}/${photoURLPath}`;
 
-            const photoLocalIDDocument = localDbFiles.find(document => document.export_image_name === photoFileName);
-
-            const photoLocalID = photoLocalIDDocument.image_id;
-
             const photoBuffer = fs.readFileSync(photoFilePath);
-            const photoStats = fs.statSync(photoFilePath);
 
-            // EXIF Parameters
-            const photoEXIFTags = ExifReader.load(photoBuffer, { expanded: true }).exif;
-            const photoEXIFDate = photoEXIFTags?.DateTimeOriginal?.description ?? photoEXIFTags?.DateTime?.description;
-            const photoDate = convertEXIFDateTime(photoEXIFDate) ?? photoStats.birthtime;
-
-            if (webflowCollectionImageFileNames.includes(imageDocument.export_image_name) ||
-                webflowCollectionImageIDs.includes(imageDocument.image_id)) {
-                this.logger.info(`${imageDocument.export_image_name} already exists on Webflow Collection ${this.pluginColour(currentCollection.name)}`);
+            if (gcImageFileNames.includes(imageDocument.export_image_name)) {
+                this.logger.info(`${imageDocument.export_image_name} has already been uploaded to Google Cloud Storage`);
                 continue;
             } else {
-                this.logger.info(`Uploading ${this.pluginColour(photoFileName)} to Webflow Collection ${currentCollection.name} (${currentCollection._id})`);
+                this.logger.info(`Uploading ${this.pluginColour(photoFileName)} to Google Cloud Storage...`);
             }
 
-            let isUploadedToWebflow = false;
-            let webflowItem: FlowStateImagine & Item;
+            let isUploadedToGCloud = false;
 
+            // Hmm this code is definitely looking a bit shaky lmao, not so confident about this
             const createItem = async () => {
-                this.logger.info(`Fetching ${this.pluginColour(photoURL)} from server...`);
+                return (await uploadToGCStorage({
+                    bucket: assetsBucket,
+                    path: photoURLPath,
+                    data: photoBuffer
+                })).on('finish', async () => {
+                    this.logger.info(`Upload to ${process.env.GCP_LF_ASSETS_BUCKET} storage finished successfully for ${this.pluginColour(photoFileName)}`);
+                    isUploadedToGCloud = true;
 
-                webflowItem = await this.webflowService.addItem(currentCollection._id, {
-                    name: photoLocalID,
-                    slug: `${photoCategory.replaceAll('-', '_')}-${photoLocalID}`,
-                    _draft: false,
-                    _archived: false,
-                    "photo-category": photoCategory.replaceAll('-', ' '),
-                    "photo-date": photoDate,
-                    "photo-file": photoURL,
-                    "photo-file-name": photoFileName,
-                    "photo-file-path": photoFilePath.split(path.sep).join(path.posix.sep)
-                }).then(item => {
-                    this.logger.info(`${this.pluginColour(item['photo-file-name'])} (${item._id}) has been uploaded to Webflow Collection ${this.pluginColour(currentCollection.name)}`);
-                    isUploadedToWebflow = true;
-
-                    return item;
+                    await this.dbs.updateDocument({ export_image_name: photoFileName }, {
+                        gc_uploaded: isUploadedToGCloud,
+                        gc_image_href: photoURL,
+                        gc_image_original_href: `https://storage.googleapis.com/${photoURLPath}`
+                    }).then((document) => this.logger.info(`${this.pluginColour(document.export_image_name)} has been updated on the database`))
+                        .catch(error => this.logger.error(`There was an error updating ${photoFileName} on the database`, this.logger.logError(error)));
+                }).on('error', async (error) => {
+                    await this.dbs.updateDocument({ export_image_name: photoFileName }, {
+                        gc_uploaded: isUploadedToGCloud,
+                    }).then((document) => this.logger.info(`${this.pluginColour(document.export_image_name)} failed to upload and has been updated on the database`))
+                        .catch(error => this.logger.error(`There was an error updating ${photoFileName} on the database`, this.logger.logError(error)));
+                    throw error;
                 });
             };
 
             try {
-                await createItem();
+                createItem();
             } catch (error) {
-                this.logger.error(`There was an error adding ${photoFileName} to Webflow`, this.logger.logError(error));
+                this.logger.error(`There was an error uploading ${photoFileName} to Google Cloud`, this.logger.logError(error));
 
                 for (let counter = 0; counter < options.retryLimit; counter++) {
-                    this.logger.info(`Retrying upload to Webflow for ${photoFileName} in 2 seconds...`);
+                    this.logger.info(`Retrying upload to Google Cloud for ${photoFileName} in 2 seconds...`);
 
                     await sleep(2000);
-                    await createItem();
+                    createItem();
 
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
-                    if (isUploadedToWebflow === true) {
+                    if (isUploadedToGCloud === true) {
                         break;
                     }
                 }
-
-            } finally {
-                const webflowItemImageData = webflowItem['photo-file'] as FlowStateImageFile;
-
-                await this.dbs.updateDocument({ export_image_name: photoFileName }, {
-                    wf_uploaded: isUploadedToWebflow,
-                    wf_item_collection_id: currentCollection._id,
-                    wf_item_id: webflowItem._id,
-                    wf_image_file_id: webflowItemImageData.fileId,
-                    wf_image_file_url: `https://uploads-ssl.webflow.com/${wfSiteInfo.database}/${webflowItemImageData.fileId}_${photoFileName}`
-                }).then((document) => this.logger.info(`${this.pluginColour(document.export_image_name)} has been updated on the database`))
-                    .catch(error => this.logger.error(`There was an error updating ${photoFileName} on the database`, this.logger.logError(error)));
             }
         }
 
-        this.logger.info('Upload to Webflow has been completed');
+        this.logger.info('Upload to Google Cloud has been completed');
     }
 
-    // async removeImages() {
-    //     await this.initializeMongoDBConnection({
-    //         dbName: IS_ENV.production ? MONGODB_DEFAULT_DATABASE : "WebflowCollectionsTestDB",
-    //         uri: process.env.MONGODB_DOMAIN,
-    //         retryLimit: 3,
-    //         retryTimeout: secondsToMs(5),
-    //         localFallback: MONGODB_FALLBACK_LOCALLY
-    //     });
+    async deleteImageFromDB(fileNames: { export_image_name?: string, source_image_name?: string; }) {
+        return await this.dbs.deleteDocument({
+            export_image_name: fileNames.export_image_name,
+            source_image_name: fileNames.source_image_name
+        });
+    }
 
-    //     const webflowCollections = await this.webflowService.getAllCollections();
-    //     const photographyCollection = webflowCollections.find(collection => collection.name.toLowerCase().includes('photography'));
-    //     const visualArtsCollection = webflowCollections.find(collection => collection.name.toLowerCase().includes('visual'));
-    //     const localDbFiles = await this.dbs.model.find({ image_processed_check: true });
+    async deleteFromGoogleCloud(fileName: string, deleteOptions?: DeleteOptions) {
+        return await assetsBucket.file(fileName).delete(deleteOptions);
+    }
 
-    //     for (const imageDocument of localDbFiles) {
-    //         const photoFileName = imageDocument.export_image_name;
-    //         const photoCategory = imageDocument.image_category;
-    //         const exportDirectoryPath = path.join(...this.exportDirectory.split(path.sep), photoCategory);
-    //         const photoSourceDirectoryFiles = fs.readdirSync(path.join(this.sourceDirectory, photoCategory));
-    //         const photoExportDirectoryFiles = fs.readdirSync(exportDirectoryPath);
-    //         const photoFilePath = path.join(...this.exportDirectory.split(path.sep), photoCategory, photoFileName);
-    //         const currentCollection = photoCategory.toLowerCase().includes('visual') ? visualArtsCollection : photographyCollection;
-    //         const webflowCollectionImages = (await this.webflowService.getCollectionItems(currentCollection._id)).map(item => item['photo-file-name']);
+    async removeImages() {
+        const localDbFiles = await this.dbs.model.find({ image_processed_check: true });
+        const gcImageFileNames = await this.getGCImageFileNames();
 
-    //         // Check if the image doesn't exist
-    //         // - in the source directory 
-    //         // - in the export directory
-    //         // - on Webflow
+        // Check if the image doesn't exist
+        // - in the source directory 
+        // - in the export directory
+        // - on Google Cloud
 
-    //         // - Images that don't exist in the database need to be deleted from everywhere 
-    //         // - Images that don't exist in the source directory anymore, need to be deleted from everywhere
-    //         // - Images that don't exist in the export directory but exist on Webflow, must be archived
-    //         // - Images that don't exist in the export directory and the database but exist on Webflow and the source directory, must be
-    //         // deleted from Webflow
-    //         // - Images/items that exist on Webflow but don't exist on in database or exported files needs to be   
-    //         // deleted from Webflow
+        // - Images that don't exist in the database need to be deleted from everywhere* 
+        // - Images that don't exist in the source directory anymore, need to be deleted from everywhere ✅
+        // - Images that don't exist in the export directory but exist on Google Cloud, must be archived
+        // - Images that don't exist in the export directory and the database but exist on Google Cloud and the source directory, must be
+        // deleted from Google Cloud
+        // - Images/items that exist on Google Cloud but don't exist in the database or exported files needs to be   
+        // deleted from Google Cloud
 
-    //     }
-    // }
+        for (const imageDocument of localDbFiles) {
+            const exportPhotoFileName = imageDocument.export_image_name;
+            const srcPhotoFileName = imageDocument.source_image_name;
+            const photoCategory = imageDocument.image_category;
+            const exportDirectoryPath = path.join(...this.exportDirectory.split(path.sep), photoCategory);
+            const sourceDirectoryPath = path.join(...this.sourceDirectory.split(path.sep), photoCategory);
+            const photoSourceDirectoryFiles = fs.readdirSync(sourceDirectoryPath);
+            const photoExportDirectoryFiles = fs.readdirSync(exportDirectoryPath);
+            const exportPhotoFilePath = path.join(exportDirectoryPath, exportPhotoFileName);
+            const srcPhotoFilePath = path.join(sourceDirectoryPath, srcPhotoFileName);
+
+            const photoURLPath = path.posix.join(this.pathPrefix, photoCategory, exportPhotoFileName);
+
+            if (!photoSourceDirectoryFiles.includes(srcPhotoFileName)) {
+                this.logger.info(`${this.pluginColour(srcPhotoFileName)} does not exist anymore, deleting from disk and the database`);
+
+                // try {
+                    // fs.rmSync(exportPhotoFilePath);
+                    // this.logger.info(`${this.pluginColour(srcPhotoFileName)} has been deleted from the disk`);
+
+                    await this.dbs.deleteDocument({
+                        source_image_name: srcPhotoFileName
+                    }).then(() => this.logger.info(`${this.pluginColour(srcPhotoFileName)} has been deleted from the database`));
+
+                    await this.deleteFromGoogleCloud(photoURLPath).then(() => this.logger.info(`${this.pluginColour(srcPhotoFileName)} has been deleted from Google Cloud Storage`));
+                // } catch (error) {
+                    // this.logger.error(`There was an error deleting ${this.pluginColour(srcPhotoFileName)}`, this.logger.logError(error));
+                // }
+            } else {
+                this.logger.debug(false, "Directory includes file")
+            }
+        }
+    }
 
     async runImagine() {
         const directories = this.categories;
@@ -470,21 +458,7 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
             this.logger.warn(`These images failed to be processed`, failedImages);
         }
 
-        const imageServer = forkChildProcess('src/plugins/imagine/imagine_server.ts', ['child'], {
-            execArgv: ['--import', 'tsx'],
-            cwd: process.cwd(),
-        }, this.logger);
-
-        imageServer.on('spawn', async () => {
-            this.logger.info('Image server launched successfully');
-
-            await this.uploadImages();
-
-            imageServer.kill();
-
-            imageServer.on('close', () => {
-                this.logger.info('Image server has been closed successfully');
-            });
-        });
+        await this.removeImages();
+        await this.uploadImages();
     }
 }

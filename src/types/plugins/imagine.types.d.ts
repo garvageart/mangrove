@@ -18,6 +18,9 @@ export interface ImagineInterface {
     image_version_number: string;
     image_processing_quality: number;
     image_processed_check?: boolean;
+    gc_uploaded?: boolean;
+    gc_image_original_href?: string;
+    gc_image_href?: string;
     wf_uploaded?: boolean;
     wf_item_collection_id?: string;
     wf_item_id?: string;

@@ -2,10 +2,11 @@ import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import util from 'util';
 import child_process from 'child_process';
-import type { isNumberBetweenCompareValueReturnTypes, isNumberBetweenCompareValueSettings } from "./types/util.types";
+import type { IUploadToGCStorage, isNumberBetweenCompareValueReturnTypes, isNumberBetweenCompareValueSettings } from "./types/util.types";
 import Logger, { GeneralLogger } from './logger';
 import { NEW_LINE_REGEX } from './globals';
 import crypto from 'crypto';
+import stream from 'stream';
 
 /**
  * Generates a randomized ID with a specified length.
@@ -488,4 +489,24 @@ export function removeItemsFromArray(array: any[], value: any) {
         }
     }
     return array;
+}
+
+export function uploadToGCStorage(options: IUploadToGCStorage): Promise<stream.PassThrough> {
+    const bucketFile = options.bucket.file(options.path);
+
+    const passthroughStream = new stream.PassThrough();
+    passthroughStream.write(options.data);
+    passthroughStream.end();
+
+    passthroughStream.pipe(bucketFile.createWriteStream(options.metadata));
+
+    return new Promise((resolve, reject) => {
+        passthroughStream.on('finish', () => {
+            resolve(passthroughStream);
+        });
+
+        passthroughStream.on('error', (error) => {
+            reject(error);
+        });
+    });
 }

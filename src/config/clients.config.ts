@@ -11,6 +11,7 @@ import {
 } from '../plugins/muse/muse_config';
 import { FastifyLogger } from '../logger';
 import { IS_ENV } from "../globals";
+import { Storage } from "@google-cloud/storage";
 
 export const spotifyClient = new SpotifyWebApi({
     clientId: SPOTIFY_CLIENT_ID,
@@ -52,3 +53,9 @@ export const twitterClient = new TwitterApi({
     accessToken: process.env.TWITTER_ACCESS_KEY,
     accessSecret: process.env.TWITTER_ACCESS_SECRET
 }).readWrite;
+
+export const gcStorage = new Storage({
+    credentials: JSON.parse(fs.readFileSync(process.env.GCP_STORAGE_KEY_FILE).toString('utf-8'))
+});
+
+export const assetsBucket = gcStorage.bucket(process.env.GCP_LF_ASSETS_BUCKET);
