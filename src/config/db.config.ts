@@ -319,6 +319,10 @@ export const left2Write = new MDBSchema<ILeft2Write>({
         type: Object,
         required: false
     },
+    l2w_pm_steps: {
+        type: [],
+        required: false
+    },
     l2w_wf_item_id: {
         type: String,
         required: false
