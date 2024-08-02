@@ -1,3 +1,4 @@
+import type { Step } from "prosemirror-transform";
 import type { FlowStateSchema } from "../webflow.service";
 import type Delta from "quill-delta";
 
@@ -31,6 +32,7 @@ export interface ILeft2Write {
 	l2w_raw_html: string;
 	l2w_ql_deltas?: Delta;
 	l2w_pm_state: object; // TODO: Create an interface for the serialized PM State
+	l2w_pm_steps: Step[];
 	l2w_last_saved_at: Date;
 	l2w_quill_save_date: Date;
 	l2w_pm_save_date: Date;
