@@ -180,6 +180,7 @@
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 1;
+		line-clamp: 1;
 		overflow: hidden;
 		line-height: 115%;
 		width: 40%;
