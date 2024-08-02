@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/stores";
 	import { editorStatus, lastSavedAt, postStatus } from "$lib/stores/editor";
-	import Loader from "$lib/states/loader.svelte";
 	import { DateTime } from "luxon";
 	import { convertToSentenceCase } from "../../../../l2w.util";
 	import type { PostAction } from "../../../../../../types/plugins/l2w.types";
@@ -10,8 +9,7 @@
 
 	const pageData = $page.data as PageData;
 	const { postData } = pageData;
-	const isDraftOrUnpublished = $postStatus === "draft" || $postStatus === "unpublished";
-
+	
 	function handleButtonKeyPress(event: KeyboardEvent, action: PostAction) {
 		if (event.code !== ("Enter" || "Space")) {
 			return;
@@ -65,20 +63,9 @@
 				</div>
 			{/if}
 			<div
-				id="lf-post-update"
-				class="header-text-container"
-				title="{$postStatus !== 'draft' ? 'Update' : 'Stage'} post to Webflow"
-				tabindex="0"
-				role="button"
-				on:click={() => publishPost(isDraftOrUnpublished ? "stage" : "update")}
-				on:keyup={(event) => handleButtonKeyPress(event, isDraftOrUnpublished ? "stage" : "update")}
-			>
-				{$postStatus !== "draft" ? "Update" : "Stage"}
-			</div>
-			<div
 				id="lf-post-publish"
 				class="header-text-container"
-				title="Publish to Webflow"
+				title="Publish to Website"
 				tabindex="0"
 				role="button"
 				on:click={() => publishPost("publish")}
@@ -157,10 +144,6 @@
 
 	#lf-editor-status:hover {
 		background-color: var(--almost-white);
-	}
-
-	#lf-post-update {
-		border-left: 1px solid var(--border-colour);
 	}
 
 	#lf-post-publish {
