@@ -7,7 +7,7 @@ import type { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import type { Collection, Item } from "webflow-api/dist/api";
 import { assetsBucket, fastifyClient } from '../../../config/clients.config';
 import { L2W_DB_CONNECTION_DEFAULTS, left2Write, left2WriteImages } from "../../../config/db.config";
-import { IS_ENV, IS_PROCESS_CHILD, URL_VALID_CHARACTERS } from '../../../globals';
+import { IS_ENV, IS_PROCESS_CHILD } from '../../../globals';
 import { DatabaseService } from "../../../services/db.service";
 import type { ImageUploadFileData } from "../../../types/plugins/l2w.editor.types";
 import type { FlowStateL2W, ILeft2Write, ILeft2WriteImages, L2WOptions, PostAction, PostStatus } from '../../../types/plugins/l2w.types';
@@ -188,21 +188,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             const storedPost = await this.dbs.model.findOne({ l2w_id: postID });
 
             try {
-                let postItem;
-                const webflowData = {
-                    name: storedPost.l2w_title,
-                    // There is definitely a better way to do this, wtf lmao?
-                    slug: `${storedPost.l2w_title.toLowerCase()
-                        .replaceAll("'", "")
-                        .replaceAll(URL_VALID_CHARACTERS, '-')
-                        .replaceAll('--', '-')}-${postID}`,
-                    "post-id": postID,
-                    "post-author": storedPost.l2w_author,
-                    "post-last-saved-at": storedPost.l2w_last_saved_at,
-                    "post-rich-text": storedPost.l2w_raw_html,
-                    "post-plain-text": storedPost.l2w_plain_text,
-                    "post-description": storedPost.l2w_summary ? storedPost.l2w_summary : storedPost.l2w_plain_text.substring(0, 250) + "...",
-                };
 
                 switch (action) {
                     case 'publish': {
@@ -214,94 +199,21 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                             return;
                         }
 
-                        postItem = await this.webflowService.updateItem(this.webflowCollection._id, storedPost.l2w_wf_item_id, {
-                            ...webflowData,
-                            _archived: false,
-                            _draft: false
-                        });
-
-                        await this.webflowService.client.publishItems({
-                            collectionId: this.webflowCollection._id,
-                            itemIds: [storedPost.l2w_wf_item_id],
-                            live: true
-                        });
-
-                        let wfPublishDomains: string[];
-                        let wfPublishStagedOnly: boolean;
-
-                        if (!IS_ENV.production) {
-                            wfPublishDomains = [process.env.PUBLIC_WEBSITE_STAGING_DOMAIN_NAME];
-                            wfPublishStagedOnly = true;
-                        } else {
-                            wfPublishDomains = [process.env.PUBLIC_WEBSITE_DOMAIN_NAME, `www.${process.env.PUBLIC_WEBSITE_DOMAIN_NAME}`];
-                            wfPublishStagedOnly = false;
-                        }
-
-                        await this.webflowService.publishSite({
-                            domains: wfPublishDomains
-                        }).then(() => {
-                            this.logger.info(`Post ${this.pluginColour(`${storedPost.l2w_title} (${storedPost.l2w_id})`)} has been published to Webflow`);
-                        });
-
-                        const publishedItem = await this.webflowService.client.item({
-                            collectionId: this.webflowCollection._id,
-                            itemId: storedPost.l2w_wf_item_id,
-                        });
-
                         await this.dbs.updateDocument({ l2w_id: postID }, {
                             l2w_wf_post_status: 'published',
-                            l2w_wf_published_at: new Date(publishedItem['published-on']),
-                            l2w_wf_published_on_staged_only: wfPublishStagedOnly,
-                            l2w_slug: publishedItem
+                            l2w_wf_published_at: new Date()
                         });
 
-                        break;
-                    }
-
-                    case 'stage': {
-                        postItem = await this.webflowService.addItem(this.webflowCollection._id, {
-                            ...webflowData,
-                            _archived: false,
-                            _draft: false
-                        });
-
-                        await this.dbs.updateDocument({ l2w_id: postID }, {
-                            l2w_wf_post_status: !postItem['published-on'] ? 'staged' : 'published',
-                            l2w_slug: postItem.slug,
-                            l2w_wf_item_id: postItem._id,
-                        });
-
-                        this.logger.info(`Post ${this.pluginColour(`${postItem.name} (${postItem['post-id']})`)} has been staged to Webflow`);
-                        break;
-                    }
-
-                    case 'update': {
-                        postItem = await this.webflowService.updateItem(this.webflowCollection._id, storedPost.l2w_wf_item_id, {
-                            ...webflowData,
-                            _archived: false,
-                            _draft: false
-                        });
-
-                        await this.dbs.updateDocument({ l2w_id: postID }, {
-                            l2w_wf_post_status: 'staged'
-                        });
-
-                        this.logger.info(`Post ${this.pluginColour(`${postItem.name} (${postItem['post-id']})`)} has been updated on Webflow`);
+                        this.logger.info(`Post ${this.pluginColour(`${storedPost.l2w_title} (${storedPost.l2w_id})`)} has been published to website`);
                         break;
                     }
 
                     case 'unpublish': {
-                        await this.webflowService.client.publishItems({
-                            collectionId: this.webflowCollection._id,
-                            itemIds: [storedPost.l2w_wf_item_id],
-                            live: false
-                        });
-
                         await this.dbs.updateDocument({ l2w_id: postID }, {
                             l2w_wf_post_status: 'unpublished'
                         });
 
-                        this.logger.info(`Post ${this.pluginColour(`${storedPost.l2w_title} (${storedPost.l2w_id})`)} has been unpublished to Webflow`);
+                        this.logger.info(`Post ${this.pluginColour(`${storedPost.l2w_title} (${storedPost.l2w_id})`)} has been unpublished to website`);
                         break;
                     }
                 }
@@ -312,8 +224,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
                 let resStatus;
 
-                // eslint-disable-next-line no-constant-condition
-                if (action === 'publish' || 'stage') {
+                if (action === 'publish' || action === 'stage') {
                     resStatus = res.status(201);
                 } else {
                     resStatus = res.status(200);
