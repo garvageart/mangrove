@@ -1,7 +1,7 @@
 import { socketStore } from "$lib/stores/socket";
 import { DOMSerializer, Node, Schema } from "prosemirror-model";
 import type { ILeft2Write, PostAction } from "../../../../../../types/plugins/l2w.types";
-import { editorContents, editorStatus, editorView, lastSavedAt, postStatus } from "$lib/stores/editor";
+import { editorContents, editorStatus, editorSteps, editorView, lastSavedAt, postStatus } from "$lib/stores/editor";
 import { dev } from "$app/environment";
 import { page } from "$app/stores";
 import type { PageData } from "./$types";
@@ -101,6 +101,7 @@ export function setUpDocument(data: ILeft2Write) {
 
 export async function saveDocument(data: Partial<ILeft2Write>) {
 	const pmState = get(editorView).state;
+	const pmSteps = get(editorSteps)
 	const loadedPageData = get(page).data as PageData;
 	const socket = get(socketStore);
 
@@ -117,6 +118,7 @@ export async function saveDocument(data: Partial<ILeft2Write>) {
 			l2w_last_saved_at: newSaveDate,
 			l2w_pm_save_date: newSaveDate,
 			l2w_pm_state: pmState,
+			l2w_pm_steps: pmSteps,
 			...data
 		});
 	} catch (error) {
