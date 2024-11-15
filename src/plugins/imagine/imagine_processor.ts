@@ -39,7 +39,7 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
         this.categories = fs.readdirSync(this.sourceDirectory);
 
         // Handle exported images
-        this.exportDirectory = path.join(this.baseDirectory, 'export', APP_VERSION.versionString);
+        this.exportDirectory = path.join(this.baseDirectory, 'export');
         mkdirpSync(this.exportDirectory);
 
         this.exportFiles = fs.readdirSync(this.exportDirectory);
@@ -398,6 +398,9 @@ export class ImaginePlugin extends PluginInstance<FlowStateImagine, ImagineInter
         return await assetsBucket.file(fileName).delete(deleteOptions);
     }
 
+    /**
+     * WIP
+     */
     async removeImages() {
         const localDbFiles = await this.dbs.model.find({ image_processed_check: true });
         const gcImageFileNames = await this.getGCImageFileNames();
