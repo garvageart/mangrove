@@ -191,14 +191,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
 
                 switch (action) {
                     case 'publish': {
-                        if (storedPost.l2w_wf_post_status === 'draft') {
-                            res.status(400).send({
-                                error: 'Post not staged'
-                            });
-
-                            return;
-                        }
-
                         await this.dbs.updateDocument({ l2w_id: postID }, {
                             l2w_wf_post_status: 'published',
                             l2w_wf_published_at: new Date()
