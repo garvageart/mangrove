@@ -502,3 +502,27 @@ export function uploadToGCStorage(options: IUploadToGCStorage): stream.PassThrou
 
     return passthroughStream;
 }
+
+export function removeEmoji(str: string) {
+    let strCopy = str;
+    const emojiKeycapRegex = /[\u0023-\u0039]\ufe0f?\u20e3/g;
+    const emojiRegex = /\p{Extended_Pictographic}/gu;
+    const emojiComponentRegex = /\p{Emoji_Component}/gu;
+    if (emojiKeycapRegex.test(strCopy)) {
+        strCopy = strCopy.replace(emojiKeycapRegex, '');
+    }
+    if (emojiRegex.test(strCopy)) {
+        strCopy = strCopy.replace(emojiRegex, '');
+    }
+    if (emojiComponentRegex.test(strCopy)) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const emoji of (strCopy.match(emojiComponentRegex) || [])) {
+            if (/[\d|*|#]/.test(emoji)) {
+                continue;
+            }
+            strCopy = strCopy.replace(emoji, '');
+        }
+    }
+
+    return strCopy;
+}
