@@ -90,10 +90,6 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
         return postStatus;
     }
 
-    // TODO: Prohibit endpoints which require connecting to Webflow
-    // if user is on localhost or is not connected to the network
-    // to prevent publishing incorrect data and if there is no
-    // valid internet connection
     async postServer() {
         fastifyClient.register(fastifyCors);
         fastifyClient.register(fastifySocketIO);
@@ -188,12 +184,13 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             const storedPost = await this.dbs.model.findOne({ l2w_id: postID });
 
             try {
-
                 switch (action) {
                     case 'publish': {
+                        const slug = `${storedPost.l2w_title.split(/\s+/g).join('-')}-${storedPost.l2w_id}`;
                         await this.dbs.updateDocument({ l2w_id: postID }, {
                             l2w_wf_post_status: 'published',
-                            l2w_wf_published_at: new Date()
+                            l2w_wf_published_at: new Date(),
+                            l2w_slug: slug
                         });
 
                         this.logger.info(`Post ${this.pluginColour(`${storedPost.l2w_title} (${storedPost.l2w_id})`)} has been published to website`);
@@ -231,8 +228,8 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                     console.log(error);
                 }
 
-                this.logger.error(`Error creating blog post on Webflow for ${this.pluginColour(`${storedPost.l2w_title} (${storedPost.l2w_id})`)}`, error);
-                res.status(400).send({ error: 'Error creating blog post on Webflow' });
+                this.logger.error(`Error creating blog post for ${this.pluginColour(`${storedPost.l2w_title} (${storedPost.l2w_id})`)}`, error);
+                res.status(400).send({ error: 'Error creating blog post' });
             }
         });
 
@@ -245,7 +242,7 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             const imageData = Buffer.from(stringData[1], 'base64url');
             const imageID = generateRandomID({ idLength: 32, numLength: 8 });
             const imageGenDate = DateTime.now();
-            const fileName = requestBodyJSON.metadata.name.split(".")[0].replaceAll(/\s/g, "_")
+            const fileName = requestBodyJSON.metadata.name.split(".")[0].replaceAll(/\s/g, "_");
             const generatedName = `${fileName}-${imageID}-${imageGenDate.toFormat('dd_LL_y-HHmmss')}`;
             const urlPath = `images/leaf/${generatedName}.${fileType}`;
 
@@ -289,11 +286,11 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
                 }
 
                 const processedData = await baseMethod.withMetadata().toBuffer({ resolveWithObject: true });
-                const uploadEvent = await uploadToGCStorage({
+                const uploadEvent = uploadToGCStorage({
                     bucket: assetsBucket,
                     path: urlPath,
                     data: processedData
-                })
+                });
 
                 uploadEvent.on('finish', () => {
                     this.logger.info(`Upload to ${process.env.GCP_LF_ASSETS_BUCKET} storage finished successfully for ${generatedName}.${fileType}`);
