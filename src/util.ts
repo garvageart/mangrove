@@ -491,7 +491,7 @@ export function removeItemsFromArray(array: any[], value: any) {
     return array;
 }
 
-export function uploadToGCStorage(options: IUploadToGCStorage): Promise<stream.PassThrough> {
+export function uploadToGCStorage(options: IUploadToGCStorage): stream.PassThrough {
     const bucketFile = options.bucket.file(options.path);
 
     const passthroughStream = new stream.PassThrough();
@@ -500,13 +500,5 @@ export function uploadToGCStorage(options: IUploadToGCStorage): Promise<stream.P
 
     passthroughStream.pipe(bucketFile.createWriteStream(options.metadata));
 
-    return new Promise((resolve, reject) => {
-        passthroughStream.on('finish', () => {
-            resolve(passthroughStream);
-        });
-
-        passthroughStream.on('error', (error) => {
-            reject(error);
-        });
-    });
+    return passthroughStream;
 }
