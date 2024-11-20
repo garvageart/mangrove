@@ -186,7 +186,8 @@ export class L2WServer extends PluginInstance<FlowStateL2W, ILeft2Write, typeof 
             try {
                 switch (action) {
                     case 'publish': {
-                        const slug = removeEmoji(`${storedPost.l2w_title.split(/\s+/g).join('-')}-${storedPost.l2w_id}`);
+                        const titleSanitized = removeEmoji(storedPost.l2w_title);
+                        const slug = `${titleSanitized.trim().split(/\s+/g).join('-')}-${storedPost.l2w_id}`
                         await this.dbs.updateDocument({ l2w_id: postID }, {
                             l2w_wf_post_status: 'published',
                             l2w_wf_published_at: new Date(),
