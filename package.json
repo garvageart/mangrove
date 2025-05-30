@@ -64,7 +64,7 @@
 		"@mrwaip/adapter-fastify": "^0.0.1-next.1",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-node": "^2.0.0",
-		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/kit": "^2.20.6",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/inquirer": "^9.0.3",
 		"@types/jquery": "^3.5.18",
