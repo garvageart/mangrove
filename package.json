@@ -22,7 +22,7 @@
 		"@fastify/cors": "^8.3.0",
 		"@fastify/static": "^6.10.1",
 		"@google-cloud/storage": "^7.1.0",
-		"@prosemirror-adapter/svelte": "^0.2.6",
+		"@prosemirror-adapter/svelte": "^0.4.1",
 		"chalk": "^5.2.0",
 		"dayjs": "^1.11.7",
 		"dotenv": "^16.0.3",
