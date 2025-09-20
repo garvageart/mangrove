@@ -87,7 +87,7 @@
 		"svelte-eslint-parser": "^0.33.1",
 		"ts-node": "^10.9.1",
 		"tsx": "^3.12.6",
-		"vite": "^5.4.19",
+		"vite": "^5.4.20",
 		"vite-plugin-node-polyfills": "^0.19.0",
 		"vitest": "^1.6.1"
 	},
